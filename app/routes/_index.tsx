@@ -28,12 +28,12 @@ export default function Home() {
                       <h1 className="text-white">Learn Skills From Our Top Instructors</h1>
                     </div>
                     <div className="main-btn slider1 mt-4">
-                      <Link to="/courses" className="nest-btn slider1">
+                      <Link to="/auth" className="nest-btn slider1">
                         <span className="nest-btn__shape slider"></span>
                         <span className="nest-btn__shape slider"></span>
                         <span className="nest-btn__shape slider"></span>
                         <span className="nest-btn__shape slider"></span>
-                        <span className="nest-btn__text">Our Courses</span>
+                        <span className="nest-btn__text">Get Started</span>
                       </Link>
                     </div>
                   </div>
@@ -132,8 +132,8 @@ export default function Home() {
                   </ul>
                 </div>
                 <div className="main-btn mt-10">
-                  <Link to="/courses" className="nest-btn px-8 py-4 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all font-semibold">
-                    Discover More
+                  <Link to="/auth" className="nest-btn px-8 py-4 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all font-semibold text-center inline-block">
+                    Get Started Now
                   </Link>
                 </div>
               </div>

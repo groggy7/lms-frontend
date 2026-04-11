@@ -46,11 +46,14 @@ export const LessonList: React.FC<LessonListProps> = ({ lessons, onLessonSelect 
             <div>
               <p className={cn(
                 "text-sm font-medium",
-                lesson.isActive ? "text-slate-100" : "group-hover:text-slate-200"
+                lesson.isActive ? "text-slate-900" : "group-hover:text-slate-200"
               )}>
                 {lesson.title}
               </p>
-              <p className="text-xs text-slate-500">{lesson.duration}</p>
+              <p className={cn(
+                "text-xs",
+                lesson.isActive ? "text-blue-700/70" : "text-slate-500"
+              )}>{lesson.duration}</p>
             </div>
           </div>
           <ChevronRight className={cn(

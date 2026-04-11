@@ -4,7 +4,7 @@ import Logo from '../Logo';
 
 const Footer: React.FC = () => {
   return (
-    <div className="footer-area">
+    <div className="footer-area pb-20">
       <div className="container">
         <div className="footer-shape1 bounce-animate-slow">
           <img src="/lumina-assets/images/footer/footer-shape-1.png" alt="" />

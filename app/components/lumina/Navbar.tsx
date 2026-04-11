@@ -1,8 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from '@remix-run/react';
 import Logo from '../Logo';
 
 const Navbar: React.FC = () => {
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('lumina_user');
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    }
+  }, []);
+
   return (
     <>
       <header className="header-area" id="sticky-header">
@@ -22,7 +33,7 @@ const Navbar: React.FC = () => {
                     <div className="sub-menu">
                       <ul>
                         <li><Link to="/">Home </Link></li>
-                        <li><Link to="/learning">Learning Platform</Link></li>
+                        <li><Link to="/course/go-concurrency">Learning Platform</Link></li>
                       </ul>
                     </div>
                   </li>
@@ -45,7 +56,7 @@ const Navbar: React.FC = () => {
                     <div className="sub-menu">
                       <ul>
                         <li><Link to="/contact">Contact Us</Link></li>
-                        <li><Link to="/learning">Learning Engine</Link></li>
+                        <li><Link to="/course/go-concurrency">Learning Engine</Link></li>
                         <li><Link to="/learning?tab=dashboard">Admin Dashboard</Link></li>
                       </ul>
                     </div>
@@ -63,13 +74,23 @@ const Navbar: React.FC = () => {
                   <li><Link className="user" to="/learning?tab=dashboard"><i className="bi bi-person-fill"></i></Link></li>
                 </ul>
                 <div className="main-btn">
-                  <Link to="/learning" className="nest-btn">
-                    <span className="nest-btn__shape"></span>
-                    <span className="nest-btn__shape"></span>
-                    <span className="nest-btn__shape"></span>
-                    <span className="nest-btn__shape"></span>
-                    <span className="nest-btn__text">Get Started</span>
-                  </Link>
+                  {user ? (
+                    <Link to="/learning?tab=dashboard" className="nest-btn">
+                      <span className="nest-btn__shape"></span>
+                      <span className="nest-btn__shape"></span>
+                      <span className="nest-btn__shape"></span>
+                      <span className="nest-btn__shape"></span>
+                      <span className="nest-btn__text">Dashboard</span>
+                    </Link>
+                  ) : (
+                    <Link to="/auth" className="nest-btn">
+                      <span className="nest-btn__shape"></span>
+                      <span className="nest-btn__shape"></span>
+                      <span className="nest-btn__shape"></span>
+                      <span className="nest-btn__shape"></span>
+                      <span className="nest-btn__text">Get Started</span>
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>
