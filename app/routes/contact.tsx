@@ -1,0 +1,70 @@
+import React from 'react';
+
+export default function Contact() {
+  return (
+    <div className="contact-area pt-100 pb-100">
+      <div className="container">
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="section-title text-center mb-50">
+              <div className="section-sub-title">
+                <h4>Contact Us</h4>
+              </div>
+              <div className="section-main-title">
+                <h2>Get In Touch With Us</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="row align-items-center">
+          <div className="col-lg-6">
+            <div className="contact-thumb">
+              <img src="/estudy-assets/images/resource/contact.png" alt="" onError={(e) => {
+                (e.target as HTMLImageElement).src = '/estudy-assets/images/resource/about.png';
+              }} />
+            </div>
+          </div>
+          <div className="col-lg-6">
+            <div className="contact-form-box">
+              <form action="#">
+                <div className="row">
+                  <div className="col-lg-6">
+                    <div className="from-box">
+                      <input type="text" placeholder="Your Name" required />
+                    </div>
+                  </div>
+                  <div className="col-lg-6">
+                    <div className="from-box">
+                      <input type="email" placeholder="Your Email" required />
+                    </div>
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="from-box">
+                      <input type="text" placeholder="Subject" required />
+                    </div>
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="from-box">
+                      <textarea name="message" placeholder="Message" required></textarea>
+                    </div>
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="contact-btn">
+                      <button type="submit" className="nest-btn">
+                        <span className="nest-btn__shape"></span>
+                        <span className="nest-btn__shape"></span>
+                        <span className="nest-btn__shape"></span>
+                        <span className="nest-btn__shape"></span>
+                        <span className="nest-btn__text">Send Message</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
