@@ -1,18 +1,14 @@
 import { PassThrough } from "node:stream";
 import { createReadableStreamFromReadable } from "@remix-run/node";
-import { Link, Links, Meta, Outlet, RemixServer, Scripts, ScrollRestoration } from "@remix-run/react";
+import { Link, Links, Meta, Outlet, RemixServer, Scripts, ScrollRestoration, useNavigate, useParams } from "@remix-run/react";
 import * as isbotModule from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@base-ui/react/button";
-import { cva } from "class-variance-authority";
+import { Activity, CheckCircle2, ChevronLeft, ChevronRight, ChevronUp, Download, FileText, Lock, PlayCircle } from "lucide-react";
+import videojs from "video.js";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Progress } from "@base-ui/react/progress";
-import { Input } from "@base-ui/react/input";
-import videojs from "video.js";
-import { Activity, BookOpen, CheckCircle2, ChevronRight, Download, FileText, LayoutDashboard, Lock, LogOut, PlayCircle, Settings } from "lucide-react";
 //#region \0rolldown/runtime.js
 var __defProp = Object.defineProperty;
 var __exportAll = (all, no_symbols) => {
@@ -98,8 +94,97 @@ function handleBrowserRequest(request, responseStatusCode, responseHeaders, remi
 	});
 }
 //#endregion
-//#region app/components/estudy/Navbar.tsx
+//#region app/components/Logo.tsx
+var Logo = ({ className = "", size = 40, showText = true, textColor = "text-slate-800" }) => {
+	return /* @__PURE__ */ jsxs("div", {
+		className: `flex items-center gap-3 ${className}`,
+		children: [/* @__PURE__ */ jsx("div", {
+			style: {
+				width: size,
+				height: size
+			},
+			className: "relative flex-shrink-0",
+			children: /* @__PURE__ */ jsxs("svg", {
+				viewBox: "0 0 100 100",
+				fill: "none",
+				xmlns: "http://www.w3.org/2000/svg",
+				className: "w-full h-full drop-shadow-sm",
+				children: [
+					/* @__PURE__ */ jsxs("defs", { children: [/* @__PURE__ */ jsxs("linearGradient", {
+						id: "logo-gradient",
+						x1: "0%",
+						y1: "0%",
+						x2: "100%",
+						y2: "100%",
+						children: [/* @__PURE__ */ jsx("stop", {
+							offset: "0%",
+							stopColor: "#3b82f6"
+						}), /* @__PURE__ */ jsx("stop", {
+							offset: "100%",
+							stopColor: "#6366f1"
+						})]
+					}), /* @__PURE__ */ jsxs("filter", {
+						id: "glow",
+						children: [/* @__PURE__ */ jsx("feGaussianBlur", {
+							stdDeviation: "2",
+							result: "blur"
+						}), /* @__PURE__ */ jsx("feComposite", {
+							in: "SourceGraphic",
+							in2: "blur",
+							operator: "over"
+						})]
+					})] }),
+					/* @__PURE__ */ jsx("path", {
+						d: "M30 20C30 14.4772 34.4772 10 40 10H70C75.5228 10 80 14.4772 80 20V30C80 35.5228 75.5228 40 70 40H50V70C50 75.5228 45.5228 80 40 80H20C14.4772 80 10 75.5228 10 70V30C10 24.4772 14.4772 20 20 20H30Z",
+						fill: "url(#logo-gradient)",
+						opacity: "0.15"
+					}),
+					/* @__PURE__ */ jsx("path", {
+						d: "M45 15L45 65C45 73.2843 38.2843 80 30 80L20 80",
+						stroke: "url(#logo-gradient)",
+						strokeWidth: "12",
+						strokeLinecap: "round"
+					}),
+					/* @__PURE__ */ jsx("path", {
+						d: "M45 15L75 15C83.2843 15 90 21.7157 90 30L90 40",
+						stroke: "url(#logo-gradient)",
+						strokeWidth: "12",
+						strokeLinecap: "round"
+					}),
+					/* @__PURE__ */ jsx("circle", {
+						cx: "70",
+						cy: "60",
+						r: "12",
+						fill: "url(#logo-gradient)",
+						filter: "url(#glow)"
+					}),
+					/* @__PURE__ */ jsx("path", {
+						d: "M70 45V50M70 70V75M85 60H80M55 60H60",
+						stroke: "url(#logo-gradient)",
+						strokeWidth: "4",
+						strokeLinecap: "round"
+					})
+				]
+			})
+		}), showText && /* @__PURE__ */ jsxs("span", {
+			className: `text-2xl font-black tracking-tight leading-none ${textColor} no-underline`,
+			children: ["Lumina", /* @__PURE__ */ jsx("span", {
+				className: "text-blue-600",
+				children: "."
+			})]
+		})]
+	});
+};
+//#endregion
+//#region app/components/lumina/Navbar.tsx
 var Navbar = () => {
+	const [user, setUser] = useState(null);
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			const storedUser = localStorage.getItem("lumina_user");
+			if (storedUser) setUser(JSON.parse(storedUser));
+		}
+	}, []);
 	return /* @__PURE__ */ jsxs(Fragment, { children: [/* @__PURE__ */ jsx("header", {
 		className: "header-area",
 		id: "sticky-header",
@@ -113,10 +198,8 @@ var Navbar = () => {
 						className: "logo",
 						children: /* @__PURE__ */ jsx(Link, {
 							to: "/",
-							children: /* @__PURE__ */ jsx("img", {
-								src: "/estudy-assets/images/logo.png",
-								alt: "Logo"
-							})
+							className: "no-underline border-none",
+							children: /* @__PURE__ */ jsx(Logo, {})
 						})
 					})
 				}), /* @__PURE__ */ jsx("div", {
@@ -133,7 +216,7 @@ var Navbar = () => {
 									to: "/",
 									children: "Home "
 								}) }), /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx(Link, {
-									to: "/learning",
+									to: "/course/go-concurrency",
 									children: "Learning Platform"
 								}) })] })
 							})] }),
@@ -147,6 +230,45 @@ var Navbar = () => {
 									children: "Courses"
 								}) }) })
 							})] }),
+							/* @__PURE__ */ jsxs("li", { children: [/* @__PURE__ */ jsxs("a", {
+								href: "#",
+								children: ["Team ", /* @__PURE__ */ jsx("i", { className: "bi bi-plus" })]
+							}), /* @__PURE__ */ jsx("div", {
+								className: "sub-menu",
+								children: /* @__PURE__ */ jsxs("ul", { children: [/* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx(Link, {
+									to: "/",
+									children: "Our Team"
+								}) }), /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx(Link, {
+									to: "/",
+									children: "Team Details"
+								}) })] })
+							})] }),
+							/* @__PURE__ */ jsxs("li", { children: [/* @__PURE__ */ jsxs("a", {
+								href: "#",
+								children: ["Pages ", /* @__PURE__ */ jsx("i", { className: "bi bi-plus" })]
+							}), /* @__PURE__ */ jsx("div", {
+								className: "sub-menu",
+								children: /* @__PURE__ */ jsxs("ul", { children: [/* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx(Link, {
+									to: "/contact",
+									children: "Contact Us"
+								}) }), /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx(Link, {
+									to: "/course/go-concurrency",
+									children: "Learning Engine"
+								}) })] })
+							})] }),
+							/* @__PURE__ */ jsxs("li", { children: [/* @__PURE__ */ jsxs("a", {
+								href: "#",
+								children: ["Blog ", /* @__PURE__ */ jsx("i", { className: "bi bi-plus" })]
+							}), /* @__PURE__ */ jsx("div", {
+								className: "sub-menu",
+								children: /* @__PURE__ */ jsxs("ul", { children: [/* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx(Link, {
+									to: "/",
+									children: "Latest Blog"
+								}) }), /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx(Link, {
+									to: "/",
+									children: "Blog Details"
+								}) })] })
+							})] }),
 							/* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx(Link, {
 								to: "/contact",
 								children: "Contacts"
@@ -158,13 +280,26 @@ var Navbar = () => {
 							}) }),
 							/* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx(Link, {
 								className: "user",
-								to: "/learning?tab=dashboard",
+								to: "/course/go-concurrency",
 								children: /* @__PURE__ */ jsx("i", { className: "bi bi-person-fill" })
 							}) })
 						] }), /* @__PURE__ */ jsx("div", {
 							className: "main-btn",
-							children: /* @__PURE__ */ jsxs(Link, {
-								to: "/learning",
+							children: user ? /* @__PURE__ */ jsxs(Link, {
+								to: "/course/go-concurrency",
+								className: "nest-btn",
+								children: [
+									/* @__PURE__ */ jsx("span", { className: "nest-btn__shape" }),
+									/* @__PURE__ */ jsx("span", { className: "nest-btn__shape" }),
+									/* @__PURE__ */ jsx("span", { className: "nest-btn__shape" }),
+									/* @__PURE__ */ jsx("span", { className: "nest-btn__shape" }),
+									/* @__PURE__ */ jsx("span", {
+										className: "nest-btn__text",
+										children: "Dashboard"
+									})
+								]
+							}) : /* @__PURE__ */ jsxs(Link, {
+								to: "/auth",
 								className: "nest-btn",
 								children: [
 									/* @__PURE__ */ jsx("span", { className: "nest-btn__shape" }),
@@ -191,10 +326,8 @@ var Navbar = () => {
 				className: "mobile-logo",
 				children: /* @__PURE__ */ jsx(Link, {
 					to: "/",
-					children: /* @__PURE__ */ jsx("img", {
-						src: "/estudy-assets/images/logo.png",
-						alt: "Logo"
-					})
+					className: "no-underline",
+					children: /* @__PURE__ */ jsx(Logo, { size: 32 })
 				})
 			}), /* @__PURE__ */ jsx("div", {
 				className: "side-menu-info",
@@ -211,24 +344,24 @@ var Navbar = () => {
 	})] });
 };
 //#endregion
-//#region app/components/estudy/Footer.tsx
+//#region app/components/lumina/Footer.tsx
 var Footer = () => {
 	return /* @__PURE__ */ jsx("div", {
-		className: "footer-area",
+		className: "footer-area pb-20",
 		children: /* @__PURE__ */ jsxs("div", {
 			className: "container",
 			children: [
 				/* @__PURE__ */ jsx("div", {
 					className: "footer-shape1 bounce-animate-slow",
 					children: /* @__PURE__ */ jsx("img", {
-						src: "/estudy-assets/images/footer/footer-shape-1.png",
+						src: "/lumina-assets/images/footer/footer-shape-1.png",
 						alt: ""
 					})
 				}),
 				/* @__PURE__ */ jsx("div", {
 					className: "footer-shape2 bounce-animate-slow",
 					children: /* @__PURE__ */ jsx("img", {
-						src: "/estudy-assets/images/footer/footer-shape-2.png",
+						src: "/lumina-assets/images/footer/footer-shape-2.png",
 						alt: ""
 					})
 				}),
@@ -244,10 +377,8 @@ var Footer = () => {
 										className: "footer-wiget-logo",
 										children: /* @__PURE__ */ jsx(Link, {
 											to: "/",
-											children: /* @__PURE__ */ jsx("img", {
-												src: "/estudy-assets/images/logo.png",
-												alt: "Footer Logo"
-											})
+											className: "no-underline",
+											children: /* @__PURE__ */ jsx(Logo, { textColor: "text-white" })
 										})
 									}),
 									/* @__PURE__ */ jsx("div", {
@@ -305,7 +436,7 @@ var Footer = () => {
 											children: "Courses"
 										}) }),
 										/* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx(Link, {
-											to: "/learning",
+											to: "/course/go-concurrency",
 											children: "Learning Platform"
 										}) })
 									] })
@@ -369,7 +500,7 @@ var Footer = () => {
 												className: "adress",
 												children: /* @__PURE__ */ jsx("a", {
 													href: "#",
-													children: "info@estudy-lms.com"
+													children: "info@lumina-learning.com"
 												})
 											})
 										] })
@@ -388,27 +519,27 @@ var Footer = () => {
 									className: "footer-widget-photo",
 									children: /* @__PURE__ */ jsxs("ul", { children: [
 										/* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("img", {
-											src: "/estudy-assets/images/footer/footer1.png",
+											src: "/lumina-assets/images/footer/footer1.png",
 											alt: ""
 										}) }),
 										/* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("img", {
-											src: "/estudy-assets/images/footer/footer2.png",
+											src: "/lumina-assets/images/footer/footer2.png",
 											alt: ""
 										}) }),
 										/* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("img", {
-											src: "/estudy-assets/images/footer/footer3.png",
+											src: "/lumina-assets/images/footer/footer3.png",
 											alt: ""
 										}) }),
 										/* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("img", {
-											src: "/estudy-assets/images/footer/footer4.png",
+											src: "/lumina-assets/images/footer/footer4.png",
 											alt: ""
 										}) }),
 										/* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("img", {
-											src: "/estudy-assets/images/footer/footer5.png",
+											src: "/lumina-assets/images/footer/footer5.png",
 											alt: ""
 										}) }),
 										/* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx("img", {
-											src: "/estudy-assets/images/footer/footer6.png",
+											src: "/lumina-assets/images/footer/footer6.png",
 											alt: ""
 										}) })
 									] })
@@ -425,7 +556,7 @@ var Footer = () => {
 							className: "copyright-text",
 							children: /* @__PURE__ */ jsxs("p", { children: ["© 2026 | All rights reserved by ", /* @__PURE__ */ jsx(Link, {
 								to: "/",
-								children: "LMS Engine"
+								children: "Lumina Learning"
 							})] })
 						})
 					}), /* @__PURE__ */ jsx("div", {
@@ -447,11 +578,49 @@ var Footer = () => {
 	});
 };
 //#endregion
+//#region app/components/ScrollToTop.tsx
+var ScrollToTop = () => {
+	const [isVisible, setIsVisible] = useState(false);
+	const toggleVisibility = () => {
+		if (window.pageYOffset > 300) setIsVisible(true);
+		else setIsVisible(false);
+	};
+	const scrollToTop = () => {
+		window.scrollTo({
+			top: 0,
+			behavior: "smooth"
+		});
+	};
+	useEffect(() => {
+		window.addEventListener("scroll", toggleVisibility);
+		return () => window.removeEventListener("scroll", toggleVisibility);
+	}, []);
+	return /* @__PURE__ */ jsx("div", {
+		className: "fixed bottom-10 right-10 z-[9999]",
+		children: isVisible && /* @__PURE__ */ jsx("button", {
+			onClick: scrollToTop,
+			className: "w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-2xl hover:bg-blue-700 hover:scale-110 transition-all duration-300 animate-in fade-in zoom-in",
+			"aria-label": "Scroll to top",
+			children: /* @__PURE__ */ jsx(ChevronUp, { className: "w-6 h-6" })
+		})
+	});
+};
+//#endregion
+//#region app/hooks/use-mounted.ts
+function useMounted() {
+	const [mounted, setMounted] = useState(false);
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+	return mounted;
+}
+//#endregion
 //#region app/root.tsx
 var root_exports = /* @__PURE__ */ __exportAll({
 	Layout: () => Layout,
 	default: () => App,
-	links: () => links
+	links: () => links,
+	meta: () => meta
 });
 var links = () => [
 	{
@@ -465,64 +634,66 @@ var links = () => [
 	},
 	{
 		rel: "stylesheet",
-		href: "/estudy-assets/css/bootstrap.min.css"
+		href: "/lumina-assets/css/bootstrap.min.css"
 	},
 	{
 		rel: "stylesheet",
-		href: "/estudy-assets/css/owl.carousel.min.css"
+		href: "/lumina-assets/css/owl.carousel.min.css"
 	},
 	{
 		rel: "stylesheet",
-		href: "/estudy-assets/css/animate.css"
+		href: "/lumina-assets/css/animate.css"
 	},
 	{
 		rel: "stylesheet",
-		href: "/estudy-assets/css/all.min.css"
+		href: "/lumina-assets/css/all.min.css"
 	},
 	{
 		rel: "stylesheet",
-		href: "/estudy-assets/css/flaticon.css"
+		href: "/lumina-assets/css/flaticon.css"
 	},
 	{
 		rel: "stylesheet",
-		href: "/estudy-assets/css/theme-default.css"
+		href: "/lumina-assets/css/theme-default.css"
 	},
 	{
 		rel: "stylesheet",
-		href: "/estudy-assets/css/meanmenu.min.css"
+		href: "/lumina-assets/css/meanmenu.min.css"
 	},
 	{
 		rel: "stylesheet",
-		href: "/estudy-assets/css/owl.transitions.css"
+		href: "/lumina-assets/css/owl.transitions.css"
 	},
 	{
 		rel: "stylesheet",
-		href: "/estudy-assets/venobox/venobox.css"
+		href: "/lumina-assets/venobox/venobox.css"
 	},
 	{
 		rel: "stylesheet",
-		href: "/estudy-assets/css/bootstrap-icons.css"
+		href: "/lumina-assets/css/bootstrap-icons.css"
 	},
 	{
 		rel: "stylesheet",
-		href: "/estudy-assets/css/style.css"
+		href: "/lumina-assets/css/style.css"
 	},
 	{
 		rel: "stylesheet",
-		href: "/estudy-assets/css/dropdown.css"
+		href: "/lumina-assets/css/dropdown.css"
 	},
 	{
 		rel: "stylesheet",
-		href: "/estudy-assets/css/responsive.css"
+		href: "/lumina-assets/css/responsive.css"
 	},
 	{
 		rel: "icon",
 		type: "image/png",
 		sizes: "56x56",
-		href: "/estudy-assets/images/fav-icon/icon.png"
+		href: "/lumina-assets/images/fav-icon/icon.png"
 	}
 ];
+var meta = () => [{ title: "Lumina Learning - Online Education & LMS" }];
 function Layout({ children }) {
+	const isMounted = useMounted();
 	return /* @__PURE__ */ jsxs("html", {
 		lang: "en",
 		children: [/* @__PURE__ */ jsxs("head", { children: [
@@ -537,6 +708,7 @@ function Layout({ children }) {
 			/* @__PURE__ */ jsx(Navbar, {}),
 			children,
 			/* @__PURE__ */ jsx(Footer, {}),
+			isMounted && /* @__PURE__ */ jsx(ScrollToTop, {}),
 			/* @__PURE__ */ jsx("div", {
 				className: "sidebar-group info-group",
 				children: /* @__PURE__ */ jsx("div", {
@@ -561,10 +733,8 @@ function Layout({ children }) {
 											className: "sidebar-logo",
 											children: /* @__PURE__ */ jsx(Link, {
 												to: "/",
-												children: /* @__PURE__ */ jsx("img", {
-													src: "/estudy-assets/images/logo.png",
-													alt: "logo"
-												})
+												className: "no-underline border-none",
+												children: /* @__PURE__ */ jsx(Logo, { size: 35 })
 											})
 										}),
 										/* @__PURE__ */ jsx("div", {
@@ -600,7 +770,7 @@ function Layout({ children }) {
 												children: [
 													/* @__PURE__ */ jsxs("li", { children: [/* @__PURE__ */ jsx("i", { className: "bi bi-geo-alt-fill" }), "6391 Elgin St. Celina, Delaware"] }),
 													/* @__PURE__ */ jsxs("li", { children: [/* @__PURE__ */ jsx("i", { className: "bi bi-telephone-fill" }), "(+001) 123-456-789"] }),
-													/* @__PURE__ */ jsxs("li", { children: [/* @__PURE__ */ jsx("i", { className: "bi bi-envelope" }), " info@estudy-lms.com"] })
+													/* @__PURE__ */ jsxs("li", { children: [/* @__PURE__ */ jsx("i", { className: "bi bi-envelope" }), " info@lumina-learning.com"] })
 												]
 											})]
 										}),
@@ -637,34 +807,24 @@ function Layout({ children }) {
 					})
 				})
 			}),
-			/* @__PURE__ */ jsx("div", {
-				className: "prgoress_scrollup",
-				children: /* @__PURE__ */ jsx("svg", {
-					className: "progress-circle svg-content",
-					width: "100%",
-					height: "100%",
-					viewBox: "-1 -1 102 102",
-					children: /* @__PURE__ */ jsx("path", { d: "M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" })
-				})
-			}),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/vendor/jquery-3.6.2.min.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/popper.min.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/bootstrap.min.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/owl.carousel.min.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/jquery.counterup.min.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/waypoints.min.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/wow.min.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/imagesloaded.pkgd.min.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/venobox/venobox.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/animated-text.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/isotope.pkgd.min.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/jquery.meanmenu.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/jquery.scrollUp.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/jquery.barfiller.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/rangeslider.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/mixitup.min.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/theme.js" }),
-			/* @__PURE__ */ jsx("script", { src: "/estudy-assets/js/script.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/vendor/jquery-3.6.2.min.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/popper.min.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/bootstrap.min.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/owl.carousel.min.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/jquery.counterup.min.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/waypoints.min.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/wow.min.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/imagesloaded.pkgd.min.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/venobox/venobox.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/animated-text.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/isotope.pkgd.min.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/jquery.meanmenu.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/jquery.scrollUp.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/jquery.barfiller.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/rangeslider.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/mixitup.min.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/theme.js" }),
+			/* @__PURE__ */ jsx("script", { src: "/lumina-assets/js/script.js" }),
 			/* @__PURE__ */ jsx(ScrollRestoration, {}),
 			/* @__PURE__ */ jsx(Scripts, {})
 		] })]
@@ -673,214 +833,6 @@ function Layout({ children }) {
 function App() {
 	return /* @__PURE__ */ jsx(Outlet, {});
 }
-//#endregion
-//#region app/lib/utils.ts
-function cn(...inputs) {
-	return twMerge(clsx(inputs));
-}
-//#endregion
-//#region app/components/ui/button.tsx
-var buttonVariants = cva("group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4", {
-	variants: {
-		variant: {
-			default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
-			outline: "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
-			secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
-			ghost: "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
-			destructive: "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
-			link: "text-primary underline-offset-4 hover:underline"
-		},
-		size: {
-			default: "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-			xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-			sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-			lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-			icon: "size-8",
-			"icon-xs": "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
-			"icon-sm": "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
-			"icon-lg": "size-9"
-		}
-	},
-	defaultVariants: {
-		variant: "default",
-		size: "default"
-	}
-});
-function Button$1({ className, variant = "default", size = "default", ...props }) {
-	return /* @__PURE__ */ jsx(Button, {
-		"data-slot": "button",
-		className: cn(buttonVariants({
-			variant,
-			size,
-			className
-		})),
-		...props
-	});
-}
-//#endregion
-//#region app/components/ui/progress.tsx
-function Progress$1({ className, children, value, ...props }) {
-	return /* @__PURE__ */ jsxs(Progress.Root, {
-		value,
-		"data-slot": "progress",
-		className: cn("flex flex-wrap gap-3", className),
-		...props,
-		children: [children, /* @__PURE__ */ jsx(ProgressTrack, { children: /* @__PURE__ */ jsx(ProgressIndicator, {}) })]
-	});
-}
-function ProgressTrack({ className, ...props }) {
-	return /* @__PURE__ */ jsx(Progress.Track, {
-		className: cn("relative flex h-1 w-full items-center overflow-x-hidden rounded-full bg-muted", className),
-		"data-slot": "progress-track",
-		...props
-	});
-}
-function ProgressIndicator({ className, ...props }) {
-	return /* @__PURE__ */ jsx(Progress.Indicator, {
-		"data-slot": "progress-indicator",
-		className: cn("h-full bg-primary transition-all", className),
-		...props
-	});
-}
-//#endregion
-//#region app/components/ui/input.tsx
-function Input$1({ className, type, ...props }) {
-	return /* @__PURE__ */ jsx(Input, {
-		type,
-		"data-slot": "input",
-		className: cn("h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40", className),
-		...props
-	});
-}
-//#endregion
-//#region app/components/ui/label.tsx
-function Label({ className, ...props }) {
-	return /* @__PURE__ */ jsx("label", {
-		"data-slot": "label",
-		className: cn("flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50", className),
-		...props
-	});
-}
-//#endregion
-//#region app/components/ui/card.tsx
-function Card({ className, size = "default", ...props }) {
-	return /* @__PURE__ */ jsx("div", {
-		"data-slot": "card",
-		"data-size": size,
-		className: cn("group/card flex flex-col gap-4 overflow-hidden rounded-xl bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl", className),
-		...props
-	});
-}
-function CardHeader({ className, ...props }) {
-	return /* @__PURE__ */ jsx("div", {
-		"data-slot": "card-header",
-		className: cn("group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-4 group-data-[size=sm]/card:px-3 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3", className),
-		...props
-	});
-}
-function CardTitle({ className, ...props }) {
-	return /* @__PURE__ */ jsx("div", {
-		"data-slot": "card-title",
-		className: cn("font-heading text-base leading-snug font-medium group-data-[size=sm]/card:text-sm", className),
-		...props
-	});
-}
-function CardContent({ className, ...props }) {
-	return /* @__PURE__ */ jsx("div", {
-		"data-slot": "card-content",
-		className: cn("px-4 group-data-[size=sm]/card:px-3", className),
-		...props
-	});
-}
-function CardFooter({ className, ...props }) {
-	return /* @__PURE__ */ jsx("div", {
-		"data-slot": "card-footer",
-		className: cn("flex items-center rounded-b-xl border-t bg-muted/50 p-4 group-data-[size=sm]/card:p-3", className),
-		...props
-	});
-}
-//#endregion
-//#region app/components/VideoUpload.tsx
-var CHUNK_SIZE = 5 * 1024 * 1024;
-var VideoUpload = () => {
-	const [file, setFile] = useState(null);
-	const [uploadProgress, setUploadProgress] = useState(0);
-	const [isUploading, setIsUploading] = useState(false);
-	const handleFileChange = (e) => {
-		if (e.target.files && e.target.files.length > 0) setFile(e.target.files[0]);
-	};
-	const uploadFile = async () => {
-		if (!file) return;
-		setIsUploading(true);
-		setUploadProgress(0);
-		const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-		const uploadId = Math.random().toString(36).substring(7);
-		for (let i = 0; i < totalChunks; i++) {
-			const start = i * CHUNK_SIZE;
-			const end = Math.min(file.size, start + CHUNK_SIZE);
-			const chunk = file.slice(start, end);
-			const formData = new FormData();
-			formData.append("chunk", chunk);
-			formData.append("chunkIndex", i.toString());
-			formData.append("totalChunks", totalChunks.toString());
-			formData.append("fileName", file.name);
-			formData.append("uploadId", uploadId);
-			try {
-				if (!(await fetch("http://localhost:8080/upload", {
-					method: "POST",
-					body: formData
-				})).ok) throw new Error("Upload failed");
-				setUploadProgress(Math.round((i + 1) / totalChunks * 100));
-			} catch (error) {
-				console.error("Error uploading chunk:", error);
-				setIsUploading(false);
-				return;
-			}
-		}
-		setIsUploading(false);
-		alert("Upload complete!");
-	};
-	return /* @__PURE__ */ jsxs(Card, {
-		className: "w-full max-w-md mx-auto mt-10 dark bg-slate-900 text-white",
-		children: [
-			/* @__PURE__ */ jsx(CardHeader, { children: /* @__PURE__ */ jsx(CardTitle, {
-				className: "text-2xl font-bold",
-				children: "Upload Video"
-			}) }),
-			/* @__PURE__ */ jsxs(CardContent, {
-				className: "space-y-4",
-				children: [/* @__PURE__ */ jsxs("div", {
-					className: "grid w-full items-center gap-1.5",
-					children: [/* @__PURE__ */ jsx(Label, {
-						htmlFor: "video-upload",
-						children: "Choose a video file"
-					}), /* @__PURE__ */ jsx(Input$1, {
-						id: "video-upload",
-						type: "file",
-						accept: "video/*",
-						onChange: handleFileChange,
-						className: "bg-slate-800 border-slate-700"
-					})]
-				}), isUploading && /* @__PURE__ */ jsxs("div", {
-					className: "space-y-2",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "flex justify-between text-sm",
-						children: [/* @__PURE__ */ jsx("span", { children: "Uploading..." }), /* @__PURE__ */ jsxs("span", { children: [uploadProgress, "%"] })]
-					}), /* @__PURE__ */ jsx(Progress$1, {
-						value: uploadProgress,
-						className: "h-2"
-					})]
-				})]
-			}),
-			/* @__PURE__ */ jsx(CardFooter, { children: /* @__PURE__ */ jsx(Button$1, {
-				onClick: uploadFile,
-				disabled: !file || isUploading,
-				className: "w-full",
-				children: isUploading ? "Uploading..." : "Start Upload"
-			}) })
-		]
-	});
-};
 //#endregion
 //#region app/components/VideoPlayer.tsx
 var VideoPlayer = (props) => {
@@ -917,6 +869,11 @@ var VideoPlayer = (props) => {
 	});
 };
 //#endregion
+//#region app/lib/utils.ts
+function cn(...inputs) {
+	return twMerge(clsx(inputs));
+}
+//#endregion
 //#region app/components/LessonList.tsx
 var LessonList = ({ lessons, onLessonSelect }) => {
 	return /* @__PURE__ */ jsx("div", {
@@ -928,10 +885,10 @@ var LessonList = ({ lessons, onLessonSelect }) => {
 			children: [/* @__PURE__ */ jsxs("div", {
 				className: "flex items-center gap-3",
 				children: [lesson.isCompleted ? /* @__PURE__ */ jsx(CheckCircle2, { className: "w-5 h-5 text-green-500" }) : lesson.isLocked ? /* @__PURE__ */ jsx(Lock, { className: "w-5 h-5 text-slate-600" }) : /* @__PURE__ */ jsx(PlayCircle, { className: cn("w-5 h-5", lesson.isActive ? "text-blue-500" : "text-slate-500 group-hover:text-blue-400") }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
-					className: cn("text-sm font-medium", lesson.isActive ? "text-slate-100" : "group-hover:text-slate-200"),
+					className: cn("text-sm font-medium", lesson.isActive ? "text-slate-900" : "group-hover:text-slate-200"),
 					children: lesson.title
 				}), /* @__PURE__ */ jsx("p", {
-					className: "text-xs text-slate-500",
+					className: cn("text-xs", lesson.isActive ? "text-blue-700/70" : "text-slate-500"),
 					children: lesson.duration
 				})] })]
 			}), /* @__PURE__ */ jsx(ChevronRight, { className: cn("w-4 h-4 transition-transform", lesson.isActive ? "rotate-90 text-blue-500" : "text-slate-600 group-hover:translate-x-1") })]
@@ -939,24 +896,21 @@ var LessonList = ({ lessons, onLessonSelect }) => {
 	});
 };
 //#endregion
-//#region app/hooks/use-mounted.ts
-function useMounted() {
-	const [mounted, setMounted] = useState(false);
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-	return mounted;
-}
-//#endregion
-//#region app/routes/learning.tsx
-var learning_exports = /* @__PURE__ */ __exportAll({ default: () => Learning });
-function Learning() {
+//#region app/routes/course.$id.tsx
+var course_$id_exports = /* @__PURE__ */ __exportAll({ default: () => CourseDetails });
+function CourseDetails() {
+	const { id } = useParams();
 	const isMounted = useMounted();
-	const [userId] = useState("user-" + Math.random().toString(36).substring(7));
-	const [activeTab, setActiveTab] = useState("learning");
+	const [user, setUser] = useState(null);
 	const [currentLesson, setCurrentLesson] = useState("lesson-1");
-	const videoId = "sample-video-id";
-	const wsRef = useRef(null);
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			const storedUser = localStorage.getItem("lumina_user");
+			if (storedUser) setUser(JSON.parse(storedUser));
+		}
+	}, []);
+	user?.id;
+	user?.role;
 	const lessons = [
 		{
 			id: "lesson-1",
@@ -964,7 +918,8 @@ function Learning() {
 			duration: "12:45",
 			isCompleted: true,
 			isLocked: false,
-			isActive: currentLesson === "lesson-1"
+			isActive: currentLesson === "lesson-1",
+			video: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
 		},
 		{
 			id: "lesson-2",
@@ -972,7 +927,8 @@ function Learning() {
 			duration: "18:20",
 			isCompleted: false,
 			isLocked: false,
-			isActive: currentLesson === "lesson-2"
+			isActive: currentLesson === "lesson-2",
+			video: "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8"
 		},
 		{
 			id: "lesson-3",
@@ -980,7 +936,8 @@ function Learning() {
 			duration: "24:15",
 			isCompleted: false,
 			isLocked: false,
-			isActive: currentLesson === "lesson-3"
+			isActive: currentLesson === "lesson-3",
+			video: "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8"
 		},
 		{
 			id: "lesson-4",
@@ -988,7 +945,8 @@ function Learning() {
 			duration: "32:10",
 			isCompleted: false,
 			isLocked: true,
-			isActive: currentLesson === "lesson-4"
+			isActive: currentLesson === "lesson-4",
+			video: ""
 		},
 		{
 			id: "lesson-5",
@@ -996,283 +954,217 @@ function Learning() {
 			duration: "15:50",
 			isCompleted: false,
 			isLocked: true,
-			isActive: currentLesson === "lesson-5"
+			isActive: currentLesson === "lesson-5",
+			video: ""
 		}
 	];
-	useEffect(() => {
-		if (!isMounted) return;
-		const socket = new WebSocket("ws://localhost:8080/ws/progress");
-		wsRef.current = socket;
-		socket.onopen = () => console.log("WebSocket connected");
-		return () => socket.close();
-	}, [isMounted]);
-	const handlePlayerReady = (player) => {
-		player.on("timeupdate", () => {
-			const currentTime = player.currentTime();
-			if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) wsRef.current.send(JSON.stringify({
-				userId,
-				videoId,
-				progress: currentTime
-			}));
-		});
+	const activeLesson = lessons.find((l) => l.id === currentLesson) || lessons[0];
+	const videoJsOptions = {
+		autoplay: true,
+		controls: true,
+		responsive: true,
+		fluid: true,
+		sources: [{
+			src: activeLesson.video,
+			type: "application/x-mpegURL"
+		}]
 	};
 	return /* @__PURE__ */ jsxs("div", {
-		className: "flex bg-slate-950 text-slate-100 overflow-hidden font-sans min-h-[calc(100vh-80px)]",
-		children: [/* @__PURE__ */ jsxs("aside", {
-			className: "w-64 border-r border-slate-900 bg-slate-950 flex flex-col shrink-0",
-			children: [
-				/* @__PURE__ */ jsx("div", {
-					className: "p-6 border-b border-slate-900",
-					children: /* @__PURE__ */ jsxs("div", {
-						className: "flex items-center gap-2",
-						children: [/* @__PURE__ */ jsx("div", {
-							className: "w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/20",
-							children: "L"
-						}), /* @__PURE__ */ jsxs("span", {
-							className: "font-bold text-xl tracking-tight",
-							children: ["LMS ", /* @__PURE__ */ jsx("span", {
-								className: "text-blue-500",
-								children: "Engine"
-							})]
+		className: "min-h-screen bg-slate-50 font-sans pb-20 text-slate-900",
+		children: [/* @__PURE__ */ jsxs("div", {
+			className: "bg-[#001a33] text-white pt-16 pb-16 relative overflow-hidden",
+			children: [/* @__PURE__ */ jsx("div", { className: "absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-blue-600/10 to-transparent pointer-events-none" }), /* @__PURE__ */ jsx("div", {
+				className: "container relative z-10",
+				children: /* @__PURE__ */ jsxs("div", {
+					className: "flex flex-col gap-6",
+					children: [/* @__PURE__ */ jsxs(Link, {
+						to: "/courses",
+						className: "flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors w-fit font-semibold",
+						children: [/* @__PURE__ */ jsx(ChevronLeft, { className: "w-4 h-4" }), /* @__PURE__ */ jsx("span", {
+							className: "text-sm",
+							children: "Explore all courses"
 						})]
-					})
-				}),
-				/* @__PURE__ */ jsxs("nav", {
-					className: "flex-1 p-4 space-y-2 mt-4",
-					children: [
-						/* @__PURE__ */ jsxs("button", {
-							onClick: () => setActiveTab("learning"),
-							className: `w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === "learning" ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:bg-slate-900"}`,
-							children: [/* @__PURE__ */ jsx(BookOpen, { className: "w-5 h-5" }), /* @__PURE__ */ jsx("span", {
-								className: "font-medium text-sm",
-								children: "Learning"
-							})]
-						}),
-						/* @__PURE__ */ jsxs("button", {
-							onClick: () => setActiveTab("dashboard"),
-							className: `w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === "dashboard" ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:bg-slate-900"}`,
-							children: [/* @__PURE__ */ jsx(LayoutDashboard, { className: "w-5 h-5" }), /* @__PURE__ */ jsx("span", {
-								className: "font-medium text-sm",
-								children: "Upload Admin"
-							})]
-						}),
-						/* @__PURE__ */ jsxs("button", {
-							className: "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-900 transition-all",
-							children: [/* @__PURE__ */ jsx(Settings, { className: "w-5 h-5" }), /* @__PURE__ */ jsx("span", {
-								className: "font-medium text-sm",
-								children: "Settings"
-							})]
-						})
-					]
-				}),
-				/* @__PURE__ */ jsx("div", {
-					className: "p-4 border-t border-slate-900",
-					children: /* @__PURE__ */ jsxs("button", {
-						className: "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-red-500/10 hover:text-red-400 transition-all",
-						children: [/* @__PURE__ */ jsx(LogOut, { className: "w-5 h-5" }), /* @__PURE__ */ jsx("span", {
-							className: "font-medium text-sm",
-							children: "Log Out"
-						})]
-					})
-				})
-			]
-		}), /* @__PURE__ */ jsxs("main", {
-			className: "flex-1 overflow-y-auto bg-slate-950 relative",
-			children: [/* @__PURE__ */ jsxs("header", {
-				className: "h-16 border-b border-slate-900 bg-slate-950/80 backdrop-blur-md sticky top-0 z-10 px-8 flex items-center justify-between",
-				children: [/* @__PURE__ */ jsxs("div", {
-					className: "flex items-center gap-2 text-sm text-slate-500",
-					children: [
-						/* @__PURE__ */ jsx("span", { children: "Courses" }),
-						/* @__PURE__ */ jsx(ChevronRight, { className: "w-4 h-4" }),
-						/* @__PURE__ */ jsx("span", {
-							className: "text-slate-200",
-							children: "Go Backend Engineering POC"
-						})
-					]
-				}), /* @__PURE__ */ jsxs("div", {
-					className: "flex items-center gap-4",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "flex items-center gap-2 px-3 py-1.5 bg-slate-900 rounded-lg border border-slate-800",
-						children: [/* @__PURE__ */ jsx("span", { className: "w-2 h-2 rounded-full bg-green-500 animate-pulse" }), /* @__PURE__ */ jsx("span", {
-							className: "text-xs font-mono text-slate-400",
-							children: "WS Connected"
-						})]
-					}), /* @__PURE__ */ jsx("div", { className: "w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 border border-slate-800" })]
-				})]
-			}), activeTab === "learning" ? /* @__PURE__ */ jsxs("div", {
-				className: "flex flex-col lg:flex-row min-h-[calc(100vh-4rem)]",
-				children: [/* @__PURE__ */ jsx("div", {
-					className: "flex-1 p-8 lg:border-r border-slate-900",
-					children: /* @__PURE__ */ jsxs("div", {
-						className: "max-w-4xl mx-auto space-y-8",
-						children: [
-							/* @__PURE__ */ jsx("div", {
-								className: "rounded-2xl overflow-hidden border border-slate-800 bg-black shadow-2xl aspect-video ring-1 ring-white/5",
-								children: isMounted ? /* @__PURE__ */ jsx(VideoPlayer, {
-									options: {
-										autoplay: false,
-										controls: true,
-										responsive: true,
-										fluid: true,
-										sources: [{
-											src: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-											type: "application/x-mpegURL"
-										}]
-									},
-									onReady: handlePlayerReady
-								}) : /* @__PURE__ */ jsx("div", {
-									className: "w-full h-full flex items-center justify-center bg-slate-900 text-slate-500",
-									children: "Loading Player..."
+					}), /* @__PURE__ */ jsxs("div", {
+						className: "flex flex-col lg:flex-row lg:items-center justify-between gap-8",
+						children: [/* @__PURE__ */ jsxs("div", {
+							className: "space-y-6 max-w-4xl",
+							children: [
+								/* @__PURE__ */ jsxs("div", {
+									className: "flex flex-wrap items-center gap-3",
+									children: [
+										/* @__PURE__ */ jsx("span", {
+											className: "px-4 py-1.5 bg-blue-600 text-white text-[10px] font-black rounded-lg uppercase tracking-[0.2em] shadow-lg shadow-blue-500/20",
+											children: "Engineering"
+										}),
+										/* @__PURE__ */ jsx("span", {
+											className: "text-slate-500 font-bold",
+											children: "•"
+										}),
+										/* @__PURE__ */ jsxs("div", {
+											className: "flex items-center gap-1.5 text-slate-300 text-sm font-medium",
+											children: [/* @__PURE__ */ jsx(CheckCircle2, { className: "w-4 h-4 text-green-400" }), /* @__PURE__ */ jsx("span", { children: "Prototype Ready" })]
+										})
+									]
+								}),
+								/* @__PURE__ */ jsxs("h1", {
+									className: "text-4xl lg:text-6xl font-black tracking-tight leading-[1.1] text-white",
+									children: [
+										"Mastering Go ",
+										/* @__PURE__ */ jsx("span", {
+											className: "text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400",
+											children: "Concurrency"
+										}),
+										" Patterns"
+									]
+								}),
+								/* @__PURE__ */ jsx("p", {
+									className: "text-slate-300 text-xl leading-relaxed max-w-3xl font-medium opacity-90",
+									children: "Build highly scalable, industrial-grade systems using goroutines, channels, and advanced synchronization architectures."
 								})
-							}),
-							/* @__PURE__ */ jsxs("div", {
+							]
+						}), /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-4" })]
+					})]
+				})
+			})]
+		}), /* @__PURE__ */ jsx("div", {
+			className: "container mt-10",
+			children: /* @__PURE__ */ jsxs("div", {
+				className: "flex flex-col lg:flex-row gap-10",
+				children: [/* @__PURE__ */ jsxs("div", {
+					className: "flex-1 space-y-10",
+					children: [/* @__PURE__ */ jsx("div", {
+						className: "bg-black rounded-[32px] overflow-hidden shadow-2xl ring-1 ring-slate-200 aspect-video",
+						children: isMounted ? /* @__PURE__ */ jsx(VideoPlayer, { options: videoJsOptions }, currentLesson) : /* @__PURE__ */ jsx("div", {
+							className: "w-full h-full flex items-center justify-center bg-slate-900 text-slate-500 italic",
+							children: "Initializing secure player..."
+						})
+					}), /* @__PURE__ */ jsxs("div", {
+						className: "bg-white rounded-[32px] p-8 shadow-xl shadow-slate-200/50 border border-slate-100",
+						children: [/* @__PURE__ */ jsxs("div", {
+							className: "flex items-center gap-4 mb-8 border-b border-slate-100 pb-6",
+							children: [
+								/* @__PURE__ */ jsx("button", {
+									className: "text-blue-600 font-bold text-lg border-b-2 border-blue-600 pb-1",
+									children: "Overview"
+								}),
+								/* @__PURE__ */ jsx("button", {
+									className: "text-slate-400 font-bold text-lg hover:text-slate-600 transition-colors",
+									children: "Resources"
+								}),
+								/* @__PURE__ */ jsx("button", {
+									className: "text-slate-400 font-bold text-lg hover:text-slate-600 transition-colors",
+									children: "Q&A"
+								})
+							]
+						}), /* @__PURE__ */ jsxs("div", {
+							className: "space-y-6",
+							children: [
+								/* @__PURE__ */ jsxs("h3", {
+									className: "text-2xl font-bold text-slate-900",
+									children: ["Current Lesson: ", activeLesson.title]
+								}),
+								/* @__PURE__ */ jsx("p", {
+									className: "text-slate-600 leading-relaxed",
+									children: "This is a prototype view. In the final version, the video content is served via adaptive HLS streaming from Cloudflare R2, with progress synchronized in real-time via WebSockets to a Go backend."
+								}),
+								/* @__PURE__ */ jsx("div", {
+									className: "grid grid-cols-1 md:grid-cols-2 gap-4 pt-4",
+									children: [
+										"Master CSP & primitive sync",
+										"Worker Pool architectures",
+										"Pipeline & Fan-out/Fan-in patterns",
+										"Context management at scale",
+										"Real-time WebSocket state sync",
+										"Memory-safe concurrency in Go"
+									].map((feat, i) => /* @__PURE__ */ jsxs("div", {
+										className: "flex items-start gap-3",
+										children: [/* @__PURE__ */ jsx(CheckCircle2, { className: "w-5 h-5 text-green-500 shrink-0 mt-0.5" }), /* @__PURE__ */ jsx("span", {
+											className: "text-slate-700 font-medium",
+											children: feat
+										})]
+									}, i))
+								})
+							]
+						})]
+					})]
+				}), /* @__PURE__ */ jsxs("div", {
+					className: "w-full lg:w-[400px] space-y-8",
+					children: [
+						/* @__PURE__ */ jsxs("div", {
+							className: "bg-white rounded-[32px] p-8 shadow-xl shadow-slate-200/50 border border-slate-100 h-fit",
+							children: [/* @__PURE__ */ jsxs("div", {
+								className: "flex items-center justify-between mb-6",
+								children: [/* @__PURE__ */ jsx("h3", {
+									className: "font-extrabold text-xl text-slate-900",
+									children: "Course Content"
+								}), /* @__PURE__ */ jsx("span", {
+									className: "text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg",
+									children: "20% DONE"
+								})]
+							}), /* @__PURE__ */ jsx(LessonList, {
+								lessons,
+								onLessonSelect: (l) => setCurrentLesson(l.id)
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "bg-white rounded-[32px] p-8 shadow-xl shadow-slate-200/50 border border-slate-100",
+							children: [/* @__PURE__ */ jsxs("h3", {
+								className: "font-extrabold text-xl text-slate-900 mb-6 flex items-center gap-2",
+								children: [/* @__PURE__ */ jsx(FileText, { className: "w-5 h-5 text-blue-600" }), "Lesson Materials"]
+							}), /* @__PURE__ */ jsx("div", {
+								className: "p-4 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-blue-500/30 transition-all text-slate-900",
+								children: /* @__PURE__ */ jsx("div", {
+									className: "flex items-center justify-between opacity-50 cursor-not-allowed",
+									children: /* @__PURE__ */ jsxs("div", {
+										className: "flex items-center gap-3",
+										children: [/* @__PURE__ */ jsx("div", {
+											className: "w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500",
+											children: /* @__PURE__ */ jsx(Download, { className: "w-5 h-5" })
+										}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+											className: "text-sm font-bold text-slate-800",
+											children: "Concurrency-Guide.pdf"
+										}), /* @__PURE__ */ jsx("p", {
+											className: "text-[10px] text-slate-500 font-medium italic",
+											children: "Backend unavailable in prototype"
+										})] })]
+									})
+								})
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "bg-blue-600 rounded-[32px] p-8 text-white shadow-xl shadow-blue-500/20",
+							children: [/* @__PURE__ */ jsxs("div", {
+								className: "flex items-center gap-3 mb-4",
+								children: [/* @__PURE__ */ jsx(Activity, { className: "w-6 h-6 text-blue-200" }), /* @__PURE__ */ jsx("h3", {
+									className: "font-extrabold text-xl",
+									children: "Lumina Engine"
+								})]
+							}), /* @__PURE__ */ jsxs("div", {
 								className: "space-y-4",
 								children: [/* @__PURE__ */ jsxs("div", {
-									className: "flex items-center justify-between",
-									children: [/* @__PURE__ */ jsx("h2", {
-										className: "text-2xl font-bold tracking-tight",
-										children: "Introduction to Go Concurrency"
-									}), /* @__PURE__ */ jsx("div", {
-										className: "flex items-center gap-2",
-										children: /* @__PURE__ */ jsx("span", {
-											className: "px-3 py-1 bg-green-500/10 text-green-400 text-xs font-semibold rounded-full border border-green-500/20",
-											children: "In Progress"
-										})
-									})]
-								}), /* @__PURE__ */ jsx("p", {
-									className: "text-slate-400 leading-relaxed max-w-2xl",
-									children: "Welcome to the first module of our high-concurrency learning series. In this session, we'll explore Go's runtime scheduler, the M:P:N model, and how to effectively manage goroutines at scale."
-								})]
-							}),
-							/* @__PURE__ */ jsxs("div", {
-								className: "grid md:grid-cols-2 gap-6 pt-4",
-								children: [/* @__PURE__ */ jsxs("div", {
-									className: "bg-slate-900/40 p-5 rounded-2xl border border-slate-800 hover:border-blue-500/30 transition-all",
-									children: [/* @__PURE__ */ jsxs("h3", {
-										className: "font-semibold mb-4 flex items-center gap-2 text-blue-400",
-										children: [/* @__PURE__ */ jsx(FileText, { className: "w-5 h-5" }), "Lesson Materials"]
-									}), /* @__PURE__ */ jsx("div", {
-										className: "space-y-3",
-										children: /* @__PURE__ */ jsx("a", {
-											href: `http://localhost:8080/download/pdf?userId=${userId}`,
-											className: "flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded-xl group hover:border-blue-500/50 transition-all",
-											children: /* @__PURE__ */ jsxs("div", {
-												className: "flex items-center gap-3",
-												children: [/* @__PURE__ */ jsx("div", {
-													className: "w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500",
-													children: /* @__PURE__ */ jsx(Download, { className: "w-4 h-4" })
-												}), /* @__PURE__ */ jsx("span", {
-													className: "text-sm font-medium",
-													children: "Concurrency-Handout.pdf"
-												})]
-											})
-										})
+									className: "flex justify-between items-center text-sm border-b border-white/10 pb-3",
+									children: [/* @__PURE__ */ jsx("span", {
+										className: "text-blue-100 opacity-80",
+										children: "Prototype Mode"
+									}), /* @__PURE__ */ jsxs("span", {
+										className: "flex items-center gap-2 font-mono",
+										children: ["Stand-alone ", /* @__PURE__ */ jsx("span", { className: "w-2 h-2 rounded-full bg-green-400" })]
 									})]
 								}), /* @__PURE__ */ jsxs("div", {
-									className: "bg-slate-900/40 p-5 rounded-2xl border border-slate-800",
-									children: [/* @__PURE__ */ jsxs("h3", {
-										className: "font-semibold mb-4 flex items-center gap-2 text-indigo-400",
-										children: [/* @__PURE__ */ jsx(Activity, { className: "w-5 h-5" }), "Live Metrics"]
-									}), /* @__PURE__ */ jsxs("div", {
-										className: "space-y-4",
-										children: [/* @__PURE__ */ jsxs("div", {
-											className: "flex justify-between items-center text-sm border-b border-slate-800/50 pb-2",
-											children: [/* @__PURE__ */ jsx("span", {
-												className: "text-slate-500 font-medium",
-												children: "User ID"
-											}), /* @__PURE__ */ jsxs("span", {
-												className: "text-slate-300 font-mono text-xs",
-												children: [userId.substring(0, 12), "..."]
-											})]
-										}), /* @__PURE__ */ jsxs("div", {
-											className: "flex justify-between items-center text-sm",
-											children: [/* @__PURE__ */ jsx("span", {
-												className: "text-slate-500 font-medium",
-												children: "Session Sync"
-											}), /* @__PURE__ */ jsx("span", {
-												className: "text-slate-300",
-												children: "Active"
-											})]
-										})]
+									className: "flex justify-between items-center text-sm",
+									children: [/* @__PURE__ */ jsx("span", {
+										className: "text-blue-100 opacity-80",
+										children: "Frontend Frame"
+									}), /* @__PURE__ */ jsx("span", {
+										className: "font-mono text-[10px]",
+										children: "Remix Framework"
 									})]
 								})]
-							})
-						]
-					})
-				}), /* @__PURE__ */ jsxs("div", {
-					className: "w-full lg:w-96 p-8 bg-slate-950/50 shrink-0 h-fit lg:h-[calc(100vh-4rem)] lg:overflow-y-auto lg:sticky lg:top-16",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "mb-6 flex items-center justify-between",
-						children: [/* @__PURE__ */ jsx("h3", {
-							className: "font-bold text-lg",
-							children: "Course Content"
-						}), /* @__PURE__ */ jsx("span", {
-							className: "text-xs font-mono text-blue-500",
-							children: "20% Complete"
-						})]
-					}), /* @__PURE__ */ jsx("div", {
-						className: "space-y-6",
-						children: /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
-							className: "text-xs font-bold text-slate-500 uppercase tracking-widest mb-3",
-							children: "Module 01: The Basics"
-						}), /* @__PURE__ */ jsx(LessonList, {
-							lessons,
-							onLessonSelect: (l) => setCurrentLesson(l.id)
-						})] })
-					})]
-				})]
-			}) : /* @__PURE__ */ jsxs("div", {
-				className: "p-8 max-w-4xl mx-auto space-y-12",
-				children: [/* @__PURE__ */ jsxs("div", {
-					className: "bg-blue-600/10 border border-blue-500/20 p-8 rounded-2xl",
-					children: [
-						/* @__PURE__ */ jsx("h2", {
-							className: "text-2xl font-bold mb-2",
-							children: "Upload Administration"
-						}),
-						/* @__PURE__ */ jsx("p", {
-							className: "text-slate-400 mb-6",
-							children: "Internal dashboard for managing video uploads and transcoding queues."
-						}),
-						/* @__PURE__ */ jsx(VideoUpload, {})
-					]
-				}), /* @__PURE__ */ jsxs("div", {
-					className: "grid md:grid-cols-3 gap-6",
-					children: [
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-slate-900/50 p-6 rounded-2xl border border-slate-800",
-							children: [/* @__PURE__ */ jsx("h4", {
-								className: "text-slate-500 text-sm font-medium mb-1",
-								children: "Queue Size"
-							}), /* @__PURE__ */ jsx("p", {
-								className: "text-3xl font-bold",
-								children: "0"
-							})]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-slate-900/50 p-6 rounded-2xl border border-slate-800",
-							children: [/* @__PURE__ */ jsx("h4", {
-								className: "text-slate-500 text-sm font-medium mb-1",
-								children: "Active Transcodes"
-							}), /* @__PURE__ */ jsx("p", {
-								className: "text-3xl font-bold text-blue-500",
-								children: "Idle"
-							})]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "bg-slate-900/50 p-6 rounded-2xl border border-slate-800",
-							children: [/* @__PURE__ */ jsx("h4", {
-								className: "text-slate-500 text-sm font-medium mb-1",
-								children: "Storage Usage"
-							}), /* @__PURE__ */ jsx("p", {
-								className: "text-3xl font-bold text-indigo-500",
-								children: "4.2 GB"
 							})]
 						})
 					]
 				})]
-			})]
+			})
 		})]
 	});
 }
@@ -1290,9 +1182,21 @@ function Contact() {
 					className: "col-lg-12",
 					children: /* @__PURE__ */ jsxs("div", {
 						className: "section-title text-center mb-50",
-						children: [/* @__PURE__ */ jsx("div", {
-							className: "section-sub-title",
-							children: /* @__PURE__ */ jsx("h4", { children: "Contact Us" })
+						children: [/* @__PURE__ */ jsxs("div", {
+							className: "flex items-center justify-center mb-4",
+							children: [/* @__PURE__ */ jsx("div", {
+								className: "section-title-shape mr-2",
+								children: /* @__PURE__ */ jsx("img", {
+									src: "/lumina-assets/images/resource/section-shape.png",
+									alt: ""
+								})
+							}), /* @__PURE__ */ jsx("div", {
+								className: "section-sub-title mb-0",
+								children: /* @__PURE__ */ jsx("h4", {
+									className: "mb-0",
+									children: "Contact Us"
+								})
+							})]
 						}), /* @__PURE__ */ jsx("div", {
 							className: "section-main-title",
 							children: /* @__PURE__ */ jsx("h2", { children: "Get In Touch With Us" })
@@ -1306,10 +1210,10 @@ function Contact() {
 					children: /* @__PURE__ */ jsx("div", {
 						className: "contact-thumb",
 						children: /* @__PURE__ */ jsx("img", {
-							src: "/estudy-assets/images/resource/contact.png",
+							src: "/lumina-assets/images/resource/contact.png",
 							alt: "",
 							onError: (e) => {
-								e.target.src = "/estudy-assets/images/resource/about.png";
+								e.target.src = "/lumina-assets/images/resource/about.png";
 							}
 						})
 					})
@@ -1400,7 +1304,7 @@ function Contact() {
 var courses_exports = /* @__PURE__ */ __exportAll({ default: () => Courses });
 function Courses() {
 	return /* @__PURE__ */ jsx("div", {
-		className: "course-area pt-100 pb-100",
+		className: "course-area pt-100 pb-100 bg-white",
 		children: /* @__PURE__ */ jsxs("div", {
 			className: "container",
 			children: [/* @__PURE__ */ jsx("div", {
@@ -1409,12 +1313,27 @@ function Courses() {
 					className: "col-lg-12",
 					children: /* @__PURE__ */ jsxs("div", {
 						className: "section-title text-center mb-50",
-						children: [/* @__PURE__ */ jsx("div", {
-							className: "section-sub-title",
-							children: /* @__PURE__ */ jsx("h4", { children: "Our Courses" })
+						children: [/* @__PURE__ */ jsxs("div", {
+							className: "flex items-center justify-center mb-4",
+							children: [/* @__PURE__ */ jsx("div", {
+								className: "section-title-shape mr-2",
+								children: /* @__PURE__ */ jsx("img", {
+									src: "/lumina-assets/images/resource/section-shape.png",
+									alt: ""
+								})
+							}), /* @__PURE__ */ jsx("div", {
+								className: "section-sub-title mb-0",
+								children: /* @__PURE__ */ jsx("h4", {
+									className: "mb-0 text-blue-600",
+									children: "Our Courses"
+								})
+							})]
 						}), /* @__PURE__ */ jsx("div", {
 							className: "section-main-title",
-							children: /* @__PURE__ */ jsx("h2", { children: "Explore Professional Courses" })
+							children: /* @__PURE__ */ jsx("h2", {
+								className: "text-slate-900",
+								children: "Explore Professional Courses"
+							})
 						})]
 					})
 				})
@@ -1472,15 +1391,22 @@ function Courses() {
 				].map((course, i) => /* @__PURE__ */ jsx("div", {
 					className: "col-lg-4 col-md-6 mb-30",
 					children: /* @__PURE__ */ jsxs("div", {
-						className: "course-single-box",
+						className: "course-single-box shadow-sm hover:shadow-lg transition-all rounded-2xl overflow-hidden border border-slate-100",
 						children: [/* @__PURE__ */ jsxs("div", {
 							className: "course-thumb",
 							children: [
 								/* @__PURE__ */ jsx("img", {
-									src: `/estudy-assets/images/course/${course.img}`,
+									src: `/lumina-assets/images/course/${course.img}`,
 									alt: course.title,
 									onError: (e) => {
-										e.target.src = "/estudy-assets/images/course/course1.png";
+										e.target.src = "/lumina-assets/images/course/course1.png";
+									}
+								}),
+								/* @__PURE__ */ jsx("img", {
+									src: `/lumina-assets/images/course/${course.img}`,
+									alt: course.title,
+									onError: (e) => {
+										e.target.src = "/lumina-assets/images/course/course1.png";
 									}
 								}),
 								/* @__PURE__ */ jsx("div", {
@@ -1493,52 +1419,65 @@ function Courses() {
 										className: "course-admin",
 										children: /* @__PURE__ */ jsx("div", {
 											className: "course-shape-title",
-											children: /* @__PURE__ */ jsx("h4", { children: course.author })
+											children: /* @__PURE__ */ jsx("h4", {
+												className: "text-white",
+												children: course.author
+											})
 										})
 									}), /* @__PURE__ */ jsxs("div", {
 										className: "course-star",
 										children: [
-											/* @__PURE__ */ jsx("i", { className: "bi bi-star-fill" }),
-											/* @__PURE__ */ jsx("i", { className: "bi bi-star-fill" }),
-											/* @__PURE__ */ jsx("i", { className: "bi bi-star-fill" }),
-											/* @__PURE__ */ jsx("i", { className: "bi bi-star-fill" }),
-											/* @__PURE__ */ jsx("i", { className: "bi bi-star-fill" })
+											/* @__PURE__ */ jsx("i", { className: "bi bi-star-fill text-yellow-400" }),
+											/* @__PURE__ */ jsx("i", { className: "bi bi-star-fill text-yellow-400" }),
+											/* @__PURE__ */ jsx("i", { className: "bi bi-star-fill text-yellow-400" }),
+											/* @__PURE__ */ jsx("i", { className: "bi bi-star-fill text-yellow-400" }),
+											/* @__PURE__ */ jsx("i", { className: "bi bi-star-fill text-yellow-400" })
 										]
 									})]
 								})
 							]
 						}), /* @__PURE__ */ jsxs("div", {
-							className: "course-content",
+							className: "course-content p-6",
 							children: [
 								/* @__PURE__ */ jsxs("div", {
-									className: "course-meta",
-									children: [/* @__PURE__ */ jsxs("span", { children: [
-										/* @__PURE__ */ jsx("i", { className: "bi bi-book" }),
-										" ",
-										course.lessons,
-										" Lesson"
-									] }), /* @__PURE__ */ jsxs("span", { children: [
-										/* @__PURE__ */ jsx("i", { className: "bi bi-clock" }),
-										" ",
-										course.duration
-									] })]
+									className: "course-meta flex items-center gap-4 text-slate-500 text-sm mb-3",
+									children: [/* @__PURE__ */ jsxs("span", {
+										className: "flex items-center gap-1",
+										children: [
+											/* @__PURE__ */ jsx("i", { className: "bi bi-book text-blue-600" }),
+											" ",
+											course.lessons,
+											" Lesson"
+										]
+									}), /* @__PURE__ */ jsxs("span", {
+										className: "flex items-center gap-1",
+										children: [
+											/* @__PURE__ */ jsx("i", { className: "bi bi-clock text-blue-600" }),
+											" ",
+											course.duration
+										]
+									})]
 								}),
 								/* @__PURE__ */ jsx("div", {
 									className: "course-title",
-									children: /* @__PURE__ */ jsx("h4", { children: /* @__PURE__ */ jsx(Link, {
-										to: "/learning",
-										children: course.title
-									}) })
+									children: /* @__PURE__ */ jsx("h4", {
+										className: "text-xl font-bold text-slate-800 hover:text-blue-600 transition-colors mb-4",
+										children: /* @__PURE__ */ jsx(Link, {
+											to: "/course/go-concurrency",
+											children: course.title
+										})
+									})
 								}),
 								/* @__PURE__ */ jsxs("div", {
-									className: "course-bottom",
+									className: "course-bottom flex items-center justify-between border-t border-slate-50 pt-4",
 									children: [/* @__PURE__ */ jsx("div", {
-										className: "course-price",
+										className: "course-price text-2xl font-bold text-blue-600",
 										children: /* @__PURE__ */ jsx("span", { children: course.price })
 									}), /* @__PURE__ */ jsx("div", {
 										className: "course-cart",
 										children: /* @__PURE__ */ jsxs(Link, {
-											to: "/learning",
+											to: "/course/go-concurrency",
+											className: "text-slate-700 font-semibold hover:text-blue-600 flex items-center gap-1 text-sm",
 											children: [/* @__PURE__ */ jsx("i", { className: "bi bi-play-fill" }), " Start Learning"]
 										})
 									})]
@@ -1552,81 +1491,278 @@ function Courses() {
 	});
 }
 //#endregion
+//#region app/components/AboutIllustration.tsx
+var AboutIllustration = () => {
+	return /* @__PURE__ */ jsxs("div", {
+		className: "relative w-full aspect-square bg-blue-50 rounded-[40px] overflow-hidden flex items-center justify-center shadow-inner",
+		children: [
+			/* @__PURE__ */ jsx("div", { className: "absolute top-0 right-0 w-64 h-64 bg-blue-100/50 rounded-full -mr-20 -mt-20 blur-3xl" }),
+			/* @__PURE__ */ jsx("div", { className: "absolute bottom-0 left-0 w-64 h-64 bg-indigo-100/50 rounded-full -ml-20 -mb-20 blur-3xl" }),
+			/* @__PURE__ */ jsxs("svg", {
+				width: "80%",
+				height: "80%",
+				viewBox: "0 0 400 400",
+				fill: "none",
+				xmlns: "http://www.w3.org/2000/svg",
+				className: "relative z-10 drop-shadow-2xl",
+				children: [
+					/* @__PURE__ */ jsx("rect", {
+						x: "60",
+						y: "80",
+						width: "280",
+						height: "200",
+						rx: "20",
+						fill: "#1e293b"
+					}),
+					/* @__PURE__ */ jsx("rect", {
+						x: "75",
+						y: "95",
+						width: "250",
+						height: "150",
+						rx: "10",
+						fill: "#334155"
+					}),
+					/* @__PURE__ */ jsx("circle", {
+						cx: "200",
+						cy: "170",
+						r: "30",
+						fill: "#3b82f6"
+					}),
+					/* @__PURE__ */ jsx("path", {
+						d: "M215 170L192.5 182.99L192.5 157.01L215 170Z",
+						fill: "white"
+					}),
+					/* @__PURE__ */ jsx("rect", {
+						x: "75",
+						y: "255",
+						width: "100",
+						height: "8",
+						rx: "4",
+						fill: "#475569"
+					}),
+					/* @__PURE__ */ jsx("rect", {
+						x: "185",
+						y: "255",
+						width: "40",
+						height: "8",
+						rx: "4",
+						fill: "#3b82f6"
+					}),
+					/* @__PURE__ */ jsx("rect", {
+						x: "100",
+						y: "280",
+						width: "200",
+						height: "40",
+						rx: "4",
+						fill: "#4f46e5"
+					}),
+					/* @__PURE__ */ jsx("rect", {
+						x: "100",
+						y: "280",
+						width: "30",
+						height: "40",
+						fill: "#4338ca"
+					}),
+					/* @__PURE__ */ jsx("rect", {
+						x: "135",
+						y: "295",
+						width: "140",
+						height: "4",
+						rx: "2",
+						fill: "#818cf8",
+						opacity: "0.5"
+					}),
+					/* @__PURE__ */ jsx("rect", {
+						x: "120",
+						y: "250",
+						width: "180",
+						height: "35",
+						rx: "4",
+						fill: "#2563eb"
+					}),
+					/* @__PURE__ */ jsx("rect", {
+						x: "120",
+						y: "250",
+						width: "30",
+						height: "35",
+						fill: "#1d4ed8"
+					}),
+					/* @__PURE__ */ jsx("rect", {
+						x: "155",
+						y: "262",
+						width: "120",
+						height: "4",
+						rx: "2",
+						fill: "#60a5fa",
+						opacity: "0.5"
+					}),
+					/* @__PURE__ */ jsx("rect", {
+						x: "140",
+						y: "220",
+						width: "160",
+						height: "35",
+						rx: "4",
+						fill: "#0ea5e9"
+					}),
+					/* @__PURE__ */ jsx("rect", {
+						x: "140",
+						y: "220",
+						width: "30",
+						height: "35",
+						fill: "#0284c7"
+					}),
+					/* @__PURE__ */ jsx("rect", {
+						x: "175",
+						y: "232",
+						width: "100",
+						height: "4",
+						rx: "2",
+						fill: "#7dd3fc",
+						opacity: "0.5"
+					}),
+					/* @__PURE__ */ jsx("rect", {
+						x: "310",
+						y: "50",
+						width: "50",
+						height: "50",
+						rx: "12",
+						fill: "white",
+						className: "animate-bounce",
+						style: { animationDuration: "3s" }
+					}),
+					/* @__PURE__ */ jsx("path", {
+						d: "M325 65L320 75L325 85M345 65L350 75L345 85",
+						stroke: "#3b82f6",
+						strokeWidth: "2",
+						strokeLinecap: "round",
+						strokeLinejoin: "round"
+					}),
+					/* @__PURE__ */ jsx("rect", {
+						x: "40",
+						y: "200",
+						width: "40",
+						height: "40",
+						rx: "10",
+						fill: "white",
+						className: "animate-pulse"
+					}),
+					/* @__PURE__ */ jsx("path", {
+						d: "M60 212L62.4721 217.008L68 217.812L64 221.71L64.9443 227.248L60 224.652L55.0557 227.248L56 221.71L52 217.812L57.5279 217.008L60 212Z",
+						fill: "#fbbf24"
+					}),
+					/* @__PURE__ */ jsx("rect", {
+						x: "300",
+						y: "280",
+						width: "60",
+						height: "60",
+						rx: "15",
+						fill: "white",
+						className: "animate-bounce",
+						style: { animationDuration: "4s" }
+					}),
+					/* @__PURE__ */ jsx("path", {
+						d: "M330 295L310 305L330 315L350 305L330 295Z",
+						fill: "#1e293b"
+					}),
+					/* @__PURE__ */ jsx("path", {
+						d: "M315 308V318C315 318 320 323 330 323C340 323 345 318 345 318V308",
+						stroke: "#1e293b",
+						strokeWidth: "2"
+					})
+				]
+			})
+		]
+	});
+};
+//#endregion
 //#region app/routes/_index.tsx
 var _index_exports = /* @__PURE__ */ __exportAll({ default: () => Home });
 function Home() {
 	return /* @__PURE__ */ jsxs(Fragment, { children: [
 		/* @__PURE__ */ jsx("div", {
-			className: "slider_list",
-			children: /* @__PURE__ */ jsxs("div", {
-				className: "slider-area d-flex align-items-center",
-				children: [/* @__PURE__ */ jsxs("div", {
-					className: "slider-shape-area",
-					children: [/* @__PURE__ */ jsx("div", {
-						className: "baner-shape1 bounce-animate",
-						children: /* @__PURE__ */ jsx("img", {
-							src: "/estudy-assets/images/slider/slider-shape.png",
-							alt: ""
-						})
-					}), /* @__PURE__ */ jsx("div", {
-						className: "baner-shape2 bounce-animate",
-						children: /* @__PURE__ */ jsx("img", {
-							src: "/estudy-assets/images/slider/slider-shape2.png",
-							alt: ""
-						})
-					})]
-				}), /* @__PURE__ */ jsx("div", {
-					className: "container",
-					children: /* @__PURE__ */ jsxs("div", {
-						className: "row align-items-center",
+			className: "banner-area",
+			children: /* @__PURE__ */ jsx("div", {
+				className: "slider_list",
+				children: /* @__PURE__ */ jsxs("div", {
+					className: "slider-area d-flex align-items-center",
+					style: {
+						backgroundColor: "#001a33",
+						minHeight: "550px"
+					},
+					children: [/* @__PURE__ */ jsxs("div", {
+						className: "slider-shape-area",
 						children: [/* @__PURE__ */ jsx("div", {
-							className: "col-lg-6",
-							children: /* @__PURE__ */ jsxs("div", {
-								className: "slider-content",
-								children: [
-									/* @__PURE__ */ jsx("div", {
-										className: "slider-sub-title",
-										children: /* @__PURE__ */ jsx("h4", { children: "100% Satisfaction Guarantee" })
-									}),
-									/* @__PURE__ */ jsx("div", {
-										className: "slider-main-title",
-										children: /* @__PURE__ */ jsx("h1", { children: "Learn Skills From Our Top Instructors" })
-									}),
-									/* @__PURE__ */ jsx("div", {
-										className: "main-btn slider1",
-										children: /* @__PURE__ */ jsxs(Link, {
-											to: "/courses",
-											className: "nest-btn slider1",
-											children: [
-												/* @__PURE__ */ jsx("span", { className: "nest-btn__shape slider" }),
-												/* @__PURE__ */ jsx("span", { className: "nest-btn__shape slider" }),
-												/* @__PURE__ */ jsx("span", { className: "nest-btn__shape slider" }),
-												/* @__PURE__ */ jsx("span", { className: "nest-btn__shape slider" }),
-												/* @__PURE__ */ jsx("span", {
-													className: "nest-btn__text",
-													children: "Our Courses"
-												})
-											]
-										})
-									})
-								]
+							className: "baner-shape1 bounce-animate",
+							children: /* @__PURE__ */ jsx("img", {
+								src: "/lumina-assets/images/slider/slider-shape.png",
+								alt: ""
 							})
 						}), /* @__PURE__ */ jsx("div", {
-							className: "col-lg-6",
-							children: /* @__PURE__ */ jsx("div", {
-								className: "slider-thumb",
-								children: /* @__PURE__ */ jsx("img", {
-									src: "/estudy-assets/images/slider/slider-thumb.png",
-									alt: ""
-								})
+							className: "baner-shape2 bounce-animate",
+							children: /* @__PURE__ */ jsx("img", {
+								src: "/lumina-assets/images/slider/slider-shape2.png",
+								alt: ""
 							})
 						})]
-					})
-				})]
+					}), /* @__PURE__ */ jsx("div", {
+						className: "container",
+						children: /* @__PURE__ */ jsxs("div", {
+							className: "row align-items-center",
+							children: [/* @__PURE__ */ jsx("div", {
+								className: "col-lg-8",
+								children: /* @__PURE__ */ jsxs("div", {
+									className: "slider-content",
+									children: [
+										/* @__PURE__ */ jsx("div", {
+											className: "slider-sub-title",
+											children: /* @__PURE__ */ jsx("h4", {
+												className: "text-blue-400",
+												children: "100% Satisfaction Guarantee"
+											})
+										}),
+										/* @__PURE__ */ jsx("div", {
+											className: "slider-main-title",
+											children: /* @__PURE__ */ jsx("h1", {
+												className: "text-white",
+												children: "Learn Skills From Our Top Instructors"
+											})
+										}),
+										/* @__PURE__ */ jsx("div", {
+											className: "main-btn slider1 mt-4",
+											children: /* @__PURE__ */ jsxs(Link, {
+												to: "/auth",
+												className: "nest-btn slider1",
+												children: [
+													/* @__PURE__ */ jsx("span", { className: "nest-btn__shape slider" }),
+													/* @__PURE__ */ jsx("span", { className: "nest-btn__shape slider" }),
+													/* @__PURE__ */ jsx("span", { className: "nest-btn__shape slider" }),
+													/* @__PURE__ */ jsx("span", { className: "nest-btn__shape slider" }),
+													/* @__PURE__ */ jsx("span", {
+														className: "nest-btn__text",
+														children: "Get Started"
+													})
+												]
+											})
+										})
+									]
+								})
+							}), /* @__PURE__ */ jsx("div", {
+								className: "col-lg-4",
+								children: /* @__PURE__ */ jsx("div", {
+									className: "slider-thumb",
+									children: /* @__PURE__ */ jsx("img", {
+										src: "/lumina-assets/images/slider/slider-thumb.png",
+										alt: ""
+									})
+								})
+							})]
+						})
+					})]
+				})
 			})
 		}),
 		/* @__PURE__ */ jsx("div", {
-			className: "catagories-area",
+			className: "catagories-area pt-100 pb-100 bg-white",
 			children: /* @__PURE__ */ jsxs("div", {
 				className: "container",
 				children: [/* @__PURE__ */ jsx("div", {
@@ -1635,23 +1771,28 @@ function Home() {
 						className: "col-lg-12",
 						children: /* @__PURE__ */ jsxs("div", {
 							className: "section-title",
-							children: [
-								/* @__PURE__ */ jsx("div", {
-									className: "section-title-shape",
+							children: [/* @__PURE__ */ jsxs("div", {
+								className: "flex items-center mb-4",
+								children: [/* @__PURE__ */ jsx("div", {
+									className: "section-title-shape mr-2",
 									children: /* @__PURE__ */ jsx("img", {
-										src: "/estudy-assets/images/resource/section-shape.png",
+										src: "/lumina-assets/images/resource/section-shape.png",
 										alt: ""
 									})
-								}),
-								/* @__PURE__ */ jsx("div", {
-									className: "section-sub-title",
-									children: /* @__PURE__ */ jsx("h4", { children: "Browse Categories" })
-								}),
-								/* @__PURE__ */ jsx("div", {
-									className: "section-main-title",
-									children: /* @__PURE__ */ jsx("h2", { children: "Top Courses Categories" })
+								}), /* @__PURE__ */ jsx("div", {
+									className: "section-sub-title mb-0",
+									children: /* @__PURE__ */ jsx("h4", {
+										className: "mb-0 text-blue-600",
+										children: "Browse Categories"
+									})
+								})]
+							}), /* @__PURE__ */ jsx("div", {
+								className: "section-main-title",
+								children: /* @__PURE__ */ jsx("h2", {
+									className: "text-slate-900",
+									children: "Top Courses Categories"
 								})
-							]
+							})]
 						})
 					})
 				}), /* @__PURE__ */ jsx("div", {
@@ -1688,7 +1829,7 @@ function Home() {
 							children: [/* @__PURE__ */ jsxs("div", {
 								className: "catagories-thumb",
 								children: [/* @__PURE__ */ jsx("img", {
-									src: `/estudy-assets/images/catagories/${cat.img}`,
+									src: `/lumina-assets/images/catagories/${cat.img}`,
 									alt: cat.title
 								}), /* @__PURE__ */ jsx("div", {
 									className: "catagories-text",
@@ -1698,6 +1839,7 @@ function Home() {
 								className: "catagories-title",
 								children: /* @__PURE__ */ jsx("h4", { children: /* @__PURE__ */ jsx(Link, {
 									to: "/courses",
+									className: "text-slate-800 hover:text-blue-600",
 									children: cat.title
 								}) })
 							})]
@@ -1707,69 +1849,100 @@ function Home() {
 			})
 		}),
 		/* @__PURE__ */ jsx("div", {
-			className: "about-area pt-100 pb-100",
+			className: "about-area pt-100 pb-100 bg-slate-50",
 			children: /* @__PURE__ */ jsx("div", {
 				className: "container",
 				children: /* @__PURE__ */ jsxs("div", {
 					className: "row align-items-center",
 					children: [/* @__PURE__ */ jsx("div", {
 						className: "col-lg-6",
-						children: /* @__PURE__ */ jsxs("div", {
-							className: "about-thumb",
-							children: [/* @__PURE__ */ jsx("img", {
-								src: "/estudy-assets/images/resource/about.png",
-								alt: ""
-							}), /* @__PURE__ */ jsx("div", {
-								className: "about-shape bounce-animate",
-								children: /* @__PURE__ */ jsx("img", {
-									src: "/estudy-assets/images/resource/section-shape.png",
-									alt: ""
-								})
-							})]
+						children: /* @__PURE__ */ jsx("div", {
+							className: "about-thumb relative",
+							children: /* @__PURE__ */ jsx(AboutIllustration, {})
 						})
 					}), /* @__PURE__ */ jsx("div", {
 						className: "col-lg-6",
 						children: /* @__PURE__ */ jsxs("div", {
-							className: "about-content",
+							className: "about-content pl-lg-10",
 							children: [
 								/* @__PURE__ */ jsxs("div", {
 									className: "section-title",
-									children: [/* @__PURE__ */ jsx("div", {
-										className: "section-sub-title",
-										children: /* @__PURE__ */ jsx("h4", { children: "About Estudy" })
+									children: [/* @__PURE__ */ jsxs("div", {
+										className: "flex items-center mb-4",
+										children: [/* @__PURE__ */ jsx("div", {
+											className: "section-title-shape mr-2",
+											children: /* @__PURE__ */ jsx("img", {
+												src: "/lumina-assets/images/resource/section-shape.png",
+												alt: ""
+											})
+										}), /* @__PURE__ */ jsx("div", {
+											className: "section-sub-title mb-0",
+											children: /* @__PURE__ */ jsx("h4", {
+												className: "mb-0 text-blue-600",
+												children: "About Lumina"
+											})
+										})]
 									}), /* @__PURE__ */ jsx("div", {
 										className: "section-main-title",
-										children: /* @__PURE__ */ jsx("h2", { children: "We Are Expert In Education Learning & LMS" })
+										children: /* @__PURE__ */ jsx("h2", {
+											className: "text-slate-900 leading-tight",
+											children: "We Are Expert In Education Learning & LMS"
+										})
 									})]
 								}),
 								/* @__PURE__ */ jsx("div", {
-									className: "about-text",
-									children: /* @__PURE__ */ jsx("p", { children: "Our platform leverages cutting-edge technology including Go, FFmpeg, and WebSockets to deliver a high-concurrency, real-time learning experience." })
+									className: "about-text mt-6",
+									children: /* @__PURE__ */ jsx("p", {
+										className: "text-slate-600 text-lg",
+										children: "Lumina leverages cutting-edge technology including Go, FFmpeg, and WebSockets to deliver a high-concurrency, real-time learning experience."
+									})
 								}),
 								/* @__PURE__ */ jsx("div", {
-									className: "about-list",
-									children: /* @__PURE__ */ jsxs("ul", { children: [
-										/* @__PURE__ */ jsxs("li", { children: [/* @__PURE__ */ jsx("i", { className: "bi bi-check-circle-fill" }), " Professional & Experienced Instructors"] }),
-										/* @__PURE__ */ jsxs("li", { children: [/* @__PURE__ */ jsx("i", { className: "bi bi-check-circle-fill" }), " Real-time Video Progress Sync"] }),
-										/* @__PURE__ */ jsxs("li", { children: [/* @__PURE__ */ jsx("i", { className: "bi bi-check-circle-fill" }), " Dynamic PDF Watermarking System"] }),
-										/* @__PURE__ */ jsxs("li", { children: [/* @__PURE__ */ jsx("i", { className: "bi bi-check-circle-fill" }), " Adaptive HLS Video Streaming"] })
-									] })
-								}),
-								/* @__PURE__ */ jsx("div", {
-									className: "main-btn",
-									children: /* @__PURE__ */ jsxs(Link, {
-										to: "/courses",
-										className: "nest-btn",
+									className: "about-list mt-8",
+									children: /* @__PURE__ */ jsxs("ul", {
+										className: "space-y-4",
 										children: [
-											/* @__PURE__ */ jsx("span", { className: "nest-btn__shape" }),
-											/* @__PURE__ */ jsx("span", { className: "nest-btn__shape" }),
-											/* @__PURE__ */ jsx("span", { className: "nest-btn__shape" }),
-											/* @__PURE__ */ jsx("span", { className: "nest-btn__shape" }),
-											/* @__PURE__ */ jsx("span", {
-												className: "nest-btn__text",
-												children: "Discover More"
+											/* @__PURE__ */ jsxs("li", {
+												className: "text-slate-700 flex items-center gap-3",
+												children: [
+													/* @__PURE__ */ jsx("i", { className: "bi bi-check-circle-fill text-blue-600 text-xl" }),
+													" ",
+													/* @__PURE__ */ jsx("span", { children: "Professional & Experienced Instructors" })
+												]
+											}),
+											/* @__PURE__ */ jsxs("li", {
+												className: "text-slate-700 flex items-center gap-3",
+												children: [
+													/* @__PURE__ */ jsx("i", { className: "bi bi-check-circle-fill text-blue-600 text-xl" }),
+													" ",
+													/* @__PURE__ */ jsx("span", { children: "Real-time Video Progress Sync" })
+												]
+											}),
+											/* @__PURE__ */ jsxs("li", {
+												className: "text-slate-700 flex items-center gap-3",
+												children: [
+													/* @__PURE__ */ jsx("i", { className: "bi bi-check-circle-fill text-blue-600 text-xl" }),
+													" ",
+													/* @__PURE__ */ jsx("span", { children: "Dynamic PDF Watermarking System" })
+												]
+											}),
+											/* @__PURE__ */ jsxs("li", {
+												className: "text-slate-700 flex items-center gap-3",
+												children: [
+													/* @__PURE__ */ jsx("i", { className: "bi bi-check-circle-fill text-blue-600 text-xl" }),
+													" ",
+													/* @__PURE__ */ jsx("span", { children: "Adaptive HLS Video Streaming" })
+												]
 											})
 										]
+									})
+								}),
+								/* @__PURE__ */ jsx("div", {
+									className: "main-btn mt-10",
+									children: /* @__PURE__ */ jsx(Link, {
+										to: "/auth",
+										className: "nest-btn px-8 py-4 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all font-semibold text-center inline-block",
+										children: "Get Started Now"
 									})
 								})
 							]
@@ -1779,11 +1952,11 @@ function Home() {
 			})
 		}),
 		/* @__PURE__ */ jsx("div", {
-			className: "counter-area",
+			className: "counter-area py-20 bg-white",
 			children: /* @__PURE__ */ jsx("div", {
 				className: "container",
 				children: /* @__PURE__ */ jsx("div", {
-					className: "row counter-bg",
+					className: "row",
 					children: [
 						{
 							count: "30",
@@ -1806,21 +1979,27 @@ function Home() {
 							icon: "flaticon-star"
 						}
 					].map((stat, i) => /* @__PURE__ */ jsx("div", {
-						className: "col-lg-3 col-md-6",
+						className: "col-lg-3 col-md-6 mb-8 mb-lg-0",
 						children: /* @__PURE__ */ jsxs("div", {
-							className: "counter-single-box",
+							className: "counter-single-box text-center",
 							children: [/* @__PURE__ */ jsx("div", {
-								className: "counter-icon",
-								children: /* @__PURE__ */ jsx("i", { className: stat.icon })
+								className: "counter-icon mb-4",
+								children: /* @__PURE__ */ jsx("i", { className: `${stat.icon} text-blue-600 text-5xl` })
 							}), /* @__PURE__ */ jsxs("div", {
-								className: "counter-content",
+								className: "counter-content text-slate-800",
 								children: [
 									/* @__PURE__ */ jsx("h3", {
-										className: "counter",
+										className: "counter text-5xl font-extrabold inline-block",
 										children: stat.count
 									}),
-									/* @__PURE__ */ jsx("span", { children: "+" }),
-									/* @__PURE__ */ jsx("p", { children: stat.label })
+									/* @__PURE__ */ jsx("span", {
+										className: "text-4xl font-bold ml-1 text-blue-600",
+										children: "+"
+									}),
+									/* @__PURE__ */ jsx("p", {
+										className: "text-slate-500 mt-2 font-medium uppercase tracking-wider text-sm",
+										children: stat.label
+									})
 								]
 							})]
 						})
@@ -1831,15 +2010,153 @@ function Home() {
 	] });
 }
 //#endregion
+//#region app/routes/auth.tsx
+var auth_exports = /* @__PURE__ */ __exportAll({ default: () => Auth });
+function Auth() {
+	const [isLogin, setIsLogin] = useState(true);
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const [fullName, setFullName] = useState("");
+	const [message, setMessage] = useState(null);
+	const [isLoading, setIsLoading] = useState(false);
+	const navigate = useNavigate();
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		setIsLoading(true);
+		setMessage(null);
+		setTimeout(() => {
+			const mockUser = {
+				id: "usr_" + Math.random().toString(36).substring(7),
+				email,
+				fullName: isLogin ? "Demo User" : fullName,
+				role: "instructor"
+			};
+			setMessage({
+				text: isLogin ? "Login successful! Redirecting..." : "Account created successfully! Redirecting...",
+				isError: false
+			});
+			localStorage.setItem("lumina_user", JSON.stringify(mockUser));
+			localStorage.setItem("lumina_token", "prototype-token");
+			setTimeout(() => {
+				navigate("/course/go-concurrency");
+			}, 1e3);
+			setIsLoading(false);
+		}, 800);
+	};
+	return /* @__PURE__ */ jsx("div", {
+		className: "min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans text-slate-900",
+		children: /* @__PURE__ */ jsxs("div", {
+			className: "max-w-md w-full bg-white rounded-[32px] shadow-2xl shadow-blue-500/10 border border-slate-100 overflow-hidden",
+			children: [/* @__PURE__ */ jsx("div", {
+				className: "p-8 pb-0 flex justify-center",
+				children: /* @__PURE__ */ jsx(Link, {
+					to: "/",
+					children: /* @__PURE__ */ jsx(Logo, { size: 50 })
+				})
+			}), /* @__PURE__ */ jsxs("div", {
+				className: "p-8 pt-6",
+				children: [
+					/* @__PURE__ */ jsxs("div", {
+						className: "text-center mb-10",
+						children: [/* @__PURE__ */ jsx("h2", {
+							className: "text-3xl font-extrabold text-slate-900 tracking-tight",
+							children: isLogin ? "Welcome Back" : "Create Account"
+						}), /* @__PURE__ */ jsx("p", {
+							className: "text-slate-500 mt-2",
+							children: "Prototype Mode: Any email/password will work."
+						})]
+					}),
+					message && /* @__PURE__ */ jsx("div", {
+						className: `mb-6 p-4 rounded-2xl text-sm font-medium border ${message.isError ? "bg-red-50 border-red-100 text-red-600" : "bg-green-50 border-green-100 text-green-600"}`,
+						children: message.text
+					}),
+					/* @__PURE__ */ jsxs("form", {
+						onSubmit: handleSubmit,
+						className: "space-y-5",
+						children: [
+							!isLogin && /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+								className: "block text-sm font-semibold text-slate-700 mb-1.5 ml-1",
+								children: "Full Name"
+							}), /* @__PURE__ */ jsx("input", {
+								type: "text",
+								value: fullName,
+								onChange: (e) => setFullName(e.target.value),
+								className: "w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400",
+								placeholder: "John Doe",
+								required: true
+							})] }),
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+								className: "block text-sm font-semibold text-slate-700 mb-1.5 ml-1",
+								children: "Email Address"
+							}), /* @__PURE__ */ jsx("input", {
+								type: "email",
+								value: email,
+								onChange: (e) => setEmail(e.target.value),
+								className: "w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400",
+								placeholder: "name@company.com",
+								required: true
+							})] }),
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+								className: "block text-sm font-semibold text-slate-700 mb-1.5 ml-1",
+								children: "Password"
+							}), /* @__PURE__ */ jsx("input", {
+								type: "password",
+								value: password,
+								onChange: (e) => setPassword(e.target.value),
+								className: "w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400",
+								placeholder: "••••••••",
+								required: true
+							})] }),
+							/* @__PURE__ */ jsxs("button", {
+								type: "submit",
+								disabled: isLoading,
+								className: `w-full py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25 active:scale-[0.98] flex items-center justify-center gap-2 ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`,
+								children: [isLoading && /* @__PURE__ */ jsxs("svg", {
+									className: "animate-spin h-5 w-5 text-white",
+									xmlns: "http://www.w3.org/2000/svg",
+									fill: "none",
+									viewBox: "0 0 24 24",
+									children: [/* @__PURE__ */ jsx("circle", {
+										className: "opacity-25",
+										cx: "12",
+										cy: "12",
+										r: "10",
+										stroke: "currentColor",
+										strokeWidth: "4"
+									}), /* @__PURE__ */ jsx("path", {
+										className: "opacity-75",
+										fill: "currentColor",
+										d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+									})]
+								}), isLogin ? "Sign In" : "Sign Up"]
+							})
+						]
+					}),
+					/* @__PURE__ */ jsx("div", {
+						className: "mt-8 pt-8 border-t border-slate-100 text-center",
+						children: /* @__PURE__ */ jsxs("p", {
+							className: "text-slate-500 text-sm",
+							children: [isLogin ? "Don't have an account?" : "Already have an account?", /* @__PURE__ */ jsx("button", {
+								onClick: () => {
+									setIsLogin(!isLogin);
+									setMessage(null);
+								},
+								className: "ml-1.5 font-bold text-blue-600 hover:text-blue-700 underline-offset-4 hover:underline",
+								children: isLogin ? "Sign up for free" : "Sign in here"
+							})]
+						})
+					})
+				]
+			})]
+		})
+	});
+}
+//#endregion
 //#region \0virtual:remix/server-manifest
 var server_manifest_default = {
 	"entry": {
-		"module": "/assets/entry.client-C-CviEvY.js",
-		"imports": [
-			"/assets/jsx-runtime-D9j7kzcp.js",
-			"/assets/components-BhY48Jpy.js",
-			"/assets/react-dom-DjHVfwz3.js"
-		],
+		"module": "/assets/entry.client-ZbKxnXS1.js",
+		"imports": ["/assets/jsx-runtime-D4LBVaVM.js", "/assets/components-BZxyE8p9.js"],
 		"css": []
 	},
 	"routes": {
@@ -1854,18 +2171,19 @@ var server_manifest_default = {
 			"hasClientAction": false,
 			"hasClientLoader": false,
 			"hasErrorBoundary": false,
-			"module": "/assets/root-B-TEfIJk.js",
+			"module": "/assets/root-DuASUci3.js",
 			"imports": [
-				"/assets/jsx-runtime-D9j7kzcp.js",
-				"/assets/components-BhY48Jpy.js",
-				"/assets/react-dom-DjHVfwz3.js"
+				"/assets/jsx-runtime-D4LBVaVM.js",
+				"/assets/components-BZxyE8p9.js",
+				"/assets/Logo-CNZPIbA0.js",
+				"/assets/use-mounted-BlDlKlFr.js"
 			],
-			"css": ["/assets/root-g46l9Ki7.css"]
+			"css": ["/assets/root-Bvu5JjNW.css"]
 		},
-		"routes/learning": {
-			"id": "routes/learning",
+		"routes/course.$id": {
+			"id": "routes/course.$id",
 			"parentId": "root",
-			"path": "learning",
+			"path": "course/:id",
 			"index": void 0,
 			"caseSensitive": void 0,
 			"hasAction": false,
@@ -1873,9 +2191,13 @@ var server_manifest_default = {
 			"hasClientAction": false,
 			"hasClientLoader": false,
 			"hasErrorBoundary": false,
-			"module": "/assets/learning-Cwp3awyX.js",
-			"imports": ["/assets/jsx-runtime-D9j7kzcp.js", "/assets/react-dom-DjHVfwz3.js"],
-			"css": ["/assets/learning-DKGaidlz.css"]
+			"module": "/assets/course._id-BUy0Zlhv.js",
+			"imports": [
+				"/assets/jsx-runtime-D4LBVaVM.js",
+				"/assets/components-BZxyE8p9.js",
+				"/assets/use-mounted-BlDlKlFr.js"
+			],
+			"css": ["/assets/course-DKGaidlz.css"]
 		},
 		"routes/contact": {
 			"id": "routes/contact",
@@ -1888,8 +2210,8 @@ var server_manifest_default = {
 			"hasClientAction": false,
 			"hasClientLoader": false,
 			"hasErrorBoundary": false,
-			"module": "/assets/contact-DNTQa0wu.js",
-			"imports": ["/assets/jsx-runtime-D9j7kzcp.js"],
+			"module": "/assets/contact-BVlzZahW.js",
+			"imports": ["/assets/jsx-runtime-D4LBVaVM.js"],
 			"css": []
 		},
 		"routes/courses": {
@@ -1903,12 +2225,8 @@ var server_manifest_default = {
 			"hasClientAction": false,
 			"hasClientLoader": false,
 			"hasErrorBoundary": false,
-			"module": "/assets/courses-_7LTmytK.js",
-			"imports": [
-				"/assets/jsx-runtime-D9j7kzcp.js",
-				"/assets/components-BhY48Jpy.js",
-				"/assets/react-dom-DjHVfwz3.js"
-			],
+			"module": "/assets/courses-BX-O7qIa.js",
+			"imports": ["/assets/jsx-runtime-D4LBVaVM.js", "/assets/components-BZxyE8p9.js"],
 			"css": []
 		},
 		"routes/_index": {
@@ -1922,17 +2240,32 @@ var server_manifest_default = {
 			"hasClientAction": false,
 			"hasClientLoader": false,
 			"hasErrorBoundary": false,
-			"module": "/assets/_index-DBoFWWL0.js",
+			"module": "/assets/_index-DVh0uU-I.js",
+			"imports": ["/assets/jsx-runtime-D4LBVaVM.js", "/assets/components-BZxyE8p9.js"],
+			"css": []
+		},
+		"routes/auth": {
+			"id": "routes/auth",
+			"parentId": "root",
+			"path": "auth",
+			"index": void 0,
+			"caseSensitive": void 0,
+			"hasAction": false,
+			"hasLoader": false,
+			"hasClientAction": false,
+			"hasClientLoader": false,
+			"hasErrorBoundary": false,
+			"module": "/assets/auth-BCv1vd5I.js",
 			"imports": [
-				"/assets/jsx-runtime-D9j7kzcp.js",
-				"/assets/components-BhY48Jpy.js",
-				"/assets/react-dom-DjHVfwz3.js"
+				"/assets/jsx-runtime-D4LBVaVM.js",
+				"/assets/components-BZxyE8p9.js",
+				"/assets/Logo-CNZPIbA0.js"
 			],
 			"css": []
 		}
 	},
-	"url": "/assets/manifest-a751356a.js",
-	"version": "a751356a"
+	"url": "/assets/manifest-0842889c.js",
+	"version": "0842889c"
 };
 //#endregion
 //#region \0virtual:remix/server-build
@@ -1964,13 +2297,13 @@ var routes = {
 		caseSensitive: void 0,
 		module: root_exports
 	},
-	"routes/learning": {
-		id: "routes/learning",
+	"routes/course.$id": {
+		id: "routes/course.$id",
 		parentId: "root",
-		path: "learning",
+		path: "course/:id",
 		index: void 0,
 		caseSensitive: void 0,
-		module: learning_exports
+		module: course_$id_exports
 	},
 	"routes/contact": {
 		id: "routes/contact",
@@ -1995,6 +2328,14 @@ var routes = {
 		index: true,
 		caseSensitive: void 0,
 		module: _index_exports
+	},
+	"routes/auth": {
+		id: "routes/auth",
+		parentId: "root",
+		path: "auth",
+		index: void 0,
+		caseSensitive: void 0,
+		module: auth_exports
 	}
 };
 //#endregion

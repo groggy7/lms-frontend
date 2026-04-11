@@ -57,7 +57,6 @@ const Navbar: React.FC = () => {
                       <ul>
                         <li><Link to="/contact">Contact Us</Link></li>
                         <li><Link to="/course/go-concurrency">Learning Engine</Link></li>
-                        <li><Link to="/learning?tab=dashboard">Admin Dashboard</Link></li>
                       </ul>
                     </div>
                   </li>
@@ -71,11 +70,11 @@ const Navbar: React.FC = () => {
                   </li>
                   <li><Link to="/contact">Contacts</Link></li>
                   <li><Link className="handbag" to="#"><i className="bi bi-cart-fill"></i></Link></li>
-                  <li><Link className="user" to="/learning?tab=dashboard"><i className="bi bi-person-fill"></i></Link></li>
+                  <li><Link className="user" to="/course/go-concurrency"><i className="bi bi-person-fill"></i></Link></li>
                 </ul>
                 <div className="main-btn">
                   {user ? (
-                    <Link to="/learning?tab=dashboard" className="nest-btn">
+                    <Link to="/course/go-concurrency" className="nest-btn">
                       <span className="nest-btn__shape"></span>
                       <span className="nest-btn__shape"></span>
                       <span className="nest-btn__shape"></span>

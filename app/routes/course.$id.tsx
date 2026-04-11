@@ -79,15 +79,6 @@ export default function CourseDetails() {
               </div>
               
               <div className="flex flex-col gap-4">
-                {userRole === 'instructor' && (
-                  <Link 
-                    to="/learning?tab=dashboard" 
-                    className="flex items-center justify-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 text-white rounded-[20px] border border-white/10 backdrop-blur-sm transition-all text-sm font-bold shadow-2xl min-w-[200px]"
-                  >
-                    <LayoutDashboard className="w-5 h-5 text-blue-400" />
-                    Management Portal
-                  </Link>
-                )}
               </div>
             </div>
           </div>
