@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from '@remix-run/react';
+import AboutIllustration from '../components/AboutIllustration';
 
 export default function Home() {
   return (
@@ -7,7 +8,7 @@ export default function Home() {
       {/* Start Banner Area */}
       <div className="banner-area">
         <div className="slider_list">
-          <div className="slider-area d-flex align-items-center" style={{ backgroundColor: '#001a33', position: 'relative', overflow: 'hidden' }}>
+          <div className="slider-area d-flex align-items-center" style={{ backgroundColor: '#001a33', minHeight: '550px' }}>
             <div className="slider-shape-area">
               <div className="baner-shape1 bounce-animate">
                 <img src="/lumina-assets/images/slider/slider-shape.png" alt="" />
@@ -16,9 +17,9 @@ export default function Home() {
                 <img src="/lumina-assets/images/slider/slider-shape2.png" alt="" />
               </div>
             </div>
-            <div className="container" style={{ position: 'relative', zIndex: 5 }}>
+            <div className="container">
               <div className="row align-items-center">
-                <div className="col-lg-6">
+                <div className="col-lg-8">
                   <div className="slider-content">
                     <div className="slider-sub-title">
                       <h4 className="text-blue-400">100% Satisfaction Guarantee</h4>
@@ -37,7 +38,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-                <div className="col-lg-6">
+                <div className="col-lg-4">
                   <div className="slider-thumb">
                     <img src="/lumina-assets/images/slider/slider-thumb.png" alt="" />
                   </div>
@@ -49,19 +50,21 @@ export default function Home() {
       </div>
 
       {/* Categories Area */}
-      <div className="catagories-area">
+      <div className="catagories-area pt-100 pb-100 bg-white">
         <div className="container">
           <div className="row">
             <div className="col-lg-12">
               <div className="section-title">
-                <div className="section-title-shape">
-                  <img src="/lumina-assets/images/resource/section-shape.png" alt="" />
-                </div>
-                <div className="section-sub-title">
-                  <h4>Browse Categories</h4>
+                <div className="flex items-center mb-4">
+                  <div className="section-title-shape mr-2">
+                    <img src="/lumina-assets/images/resource/section-shape.png" alt="" />
+                  </div>
+                  <div className="section-sub-title mb-0">
+                    <h4 className="mb-0 text-blue-600">Browse Categories</h4>
+                  </div>
                 </div>
                 <div className="section-main-title">
-                  <h2>Top Courses Categories</h2>
+                  <h2 className="text-slate-900">Top Courses Categories</h2>
                 </div>
               </div>
             </div>
@@ -84,7 +87,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="catagories-title">
-                    <h4><Link to="/courses">{cat.title}</Link></h4>
+                    <h4><Link to="/courses" className="text-slate-800 hover:text-blue-600">{cat.title}</Link></h4>
                   </div>
                 </div>
               </div>
@@ -94,45 +97,43 @@ export default function Home() {
       </div>
 
       {/* About Area */}
-      <div className="about-area pt-100 pb-100">
+      <div className="about-area pt-100 pb-100 bg-slate-50">
         <div className="container">
           <div className="row align-items-center">
             <div className="col-lg-6">
-              <div className="about-thumb">
-                <img src="/lumina-assets/images/resource/about.png" alt="" />
-                <div className="about-shape bounce-animate">
-                  <img src="/lumina-assets/images/resource/section-shape.png" alt="" />
-                </div>
+              <div className="about-thumb relative">
+                <AboutIllustration />
               </div>
             </div>
             <div className="col-lg-6">
-              <div className="about-content">
+              <div className="about-content pl-lg-10">
                 <div className="section-title">
-                  <div className="section-sub-title">
-                    <h4>About Lumina</h4>
+                  <div className="flex items-center mb-4">
+                    <div className="section-title-shape mr-2">
+                      <img src="/lumina-assets/images/resource/section-shape.png" alt="" />
+                    </div>
+                    <div className="section-sub-title mb-0">
+                      <h4 className="mb-0 text-blue-600">About Lumina</h4>
+                    </div>
                   </div>
                   <div className="section-main-title">
-                    <h2>We Are Expert In Education Learning & LMS</h2>
+                    <h2 className="text-slate-900 leading-tight">We Are Expert In Education Learning & LMS</h2>
                   </div>
                 </div>
-                <div className="about-text">
-                  <p>Lumina leverages cutting-edge technology including Go, FFmpeg, and WebSockets to deliver a high-concurrency, real-time learning experience.</p>
+                <div className="about-text mt-6">
+                  <p className="text-slate-600 text-lg">Lumina leverages cutting-edge technology including Go, FFmpeg, and WebSockets to deliver a high-concurrency, real-time learning experience.</p>
                 </div>
-                <div className="about-list">
-                  <ul>
-                    <li><i className="bi bi-check-circle-fill"></i> Professional & Experienced Instructors</li>
-                    <li><i className="bi bi-check-circle-fill"></i> Real-time Video Progress Sync</li>
-                    <li><i className="bi bi-check-circle-fill"></i> Dynamic PDF Watermarking System</li>
-                    <li><i className="bi bi-check-circle-fill"></i> Adaptive HLS Video Streaming</li>
+                <div className="about-list mt-8">
+                  <ul className="space-y-4">
+                    <li className="text-slate-700 flex items-center gap-3"><i className="bi bi-check-circle-fill text-blue-600 text-xl"></i> <span>Professional & Experienced Instructors</span></li>
+                    <li className="text-slate-700 flex items-center gap-3"><i className="bi bi-check-circle-fill text-blue-600 text-xl"></i> <span>Real-time Video Progress Sync</span></li>
+                    <li className="text-slate-700 flex items-center gap-3"><i className="bi bi-check-circle-fill text-blue-600 text-xl"></i> <span>Dynamic PDF Watermarking System</span></li>
+                    <li className="text-slate-700 flex items-center gap-3"><i className="bi bi-check-circle-fill text-blue-600 text-xl"></i> <span>Adaptive HLS Video Streaming</span></li>
                   </ul>
                 </div>
-                <div className="main-btn">
-                  <Link to="/courses" className="nest-btn">
-                    <span className="nest-btn__shape"></span>
-                    <span className="nest-btn__shape"></span>
-                    <span className="nest-btn__shape"></span>
-                    <span className="nest-btn__shape"></span>
-                    <span className="nest-btn__text">Discover More</span>
+                <div className="main-btn mt-10">
+                  <Link to="/courses" className="nest-btn px-8 py-4 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all font-semibold">
+                    Discover More
                   </Link>
                 </div>
               </div>
@@ -142,24 +143,24 @@ export default function Home() {
       </div>
 
       {/* Counter Area */}
-      <div className="counter-area">
+      <div className="counter-area py-20 bg-white">
         <div className="container">
-          <div className="row counter-bg">
+          <div className="row">
             {[
               { count: '30', label: 'Expert Instructors', icon: 'flaticon-graduation-cap' },
               { count: '120', label: 'Online Courses', icon: 'flaticon-book' },
               { count: '250', label: 'Students Learning', icon: 'flaticon-user' },
               { count: '100', label: 'Satisfaction Rate', icon: 'flaticon-star' },
             ].map((stat, i) => (
-              <div key={i} className="col-lg-3 col-md-6">
-                <div className="counter-single-box">
-                  <div className="counter-icon">
-                    <i className={stat.icon}></i>
+              <div key={i} className="col-lg-3 col-md-6 mb-8 mb-lg-0">
+                <div className="counter-single-box text-center">
+                  <div className="counter-icon mb-4">
+                    <i className={`${stat.icon} text-blue-600 text-5xl`}></i>
                   </div>
-                  <div className="counter-content">
-                    <h3 className="counter">{stat.count}</h3>
-                    <span>+</span>
-                    <p>{stat.label}</p>
+                  <div className="counter-content text-slate-800">
+                    <h3 className="counter text-5xl font-extrabold inline-block">{stat.count}</h3>
+                    <span className="text-4xl font-bold ml-1 text-blue-600">+</span>
+                    <p className="text-slate-500 mt-2 font-medium uppercase tracking-wider text-sm">{stat.label}</p>
                   </div>
                 </div>
               </div>

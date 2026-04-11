@@ -74,3 +74,21 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Template Fixes: Ensure content is visible even without OWL Carousel active state or WOW.js */
+.slider-sub-title, 
+.slider-main-title, 
+.main-btn.slider1,
+.wow {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+.slider-content {
+  position: relative !important;
+  top: 0 !important;
+  transform: none !important;
+  width: 100% !important;
+}
+

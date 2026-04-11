@@ -7,8 +7,13 @@ export default function Contact() {
         <div className="row">
           <div className="col-lg-12">
             <div className="section-title text-center mb-50">
-              <div className="section-sub-title">
-                <h4>Contact Us</h4>
+              <div className="flex items-center justify-center mb-4">
+                <div className="section-title-shape mr-2">
+                  <img src="/lumina-assets/images/resource/section-shape.png" alt="" />
+                </div>
+                <div className="section-sub-title mb-0">
+                  <h4 className="mb-0">Contact Us</h4>
+                </div>
               </div>
               <div className="section-main-title">
                 <h2>Get In Touch With Us</h2>

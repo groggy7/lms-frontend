@@ -9,8 +9,11 @@ import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 
 import "./index.css";
-import Navbar from "./components/estudy/Navbar";
-import Footer from "./components/estudy/Footer";
+import Navbar from "./components/lumina/Navbar";
+import Footer from "./components/lumina/Footer";
+import Logo from "./components/Logo";
+import ScrollToTop from "./components/ScrollToTop";
+import { useMounted } from "./hooks/use-mounted";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -33,13 +36,15 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: "/lumina-assets/css/dropdown.css" },
   { rel: "stylesheet", href: "/lumina-assets/css/responsive.css" },
   { rel: "icon", type: "image/png", sizes: "56x56", href: "/lumina-assets/images/fav-icon/icon.png" },
-  ];
+];
 
-  export const meta: MetaFunction = () => [
+export const meta: MetaFunction = () => [
   { title: "Lumina Learning - Online Education & LMS" },
-  ];
+];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const isMounted = useMounted();
+
   return (
     <html lang="en">
       <head>
@@ -55,6 +60,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
         <Footer />
 
+        {isMounted && <ScrollToTop />}
+
         {/* Start Sidebar Area */}
         <div className="sidebar-group info-group">
           <div className="sidebar-widget">
@@ -68,9 +75,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <div className="sidebar-info-contents">
                   <div className="content-inner">
                     <div className="sidebar-logo">
-                      <Link to="/" className="flex items-center gap-2">
-                        <img src="/lumina-assets/images/fav-icon/icon.png" alt="logo" style={{ maxWidth: '35px' }} />
-                        <span className="text-xl font-bold tracking-tight text-slate-800">Lumina</span>
+                      <Link to="/" className="no-underline border-none">
+                        <Logo size={35} />
                       </Link>
                     </div>
                     <div className="sidebar-widget-menu">
@@ -98,13 +104,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Scrollup section */}
-        <div className="prgoress_scrollup">
-          <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
-            <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
-          </svg>
         </div>
         
         {/* Scripts from template */}
