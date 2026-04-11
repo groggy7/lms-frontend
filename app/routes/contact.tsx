@@ -19,8 +19,8 @@ export default function Contact() {
         <div className="row align-items-center">
           <div className="col-lg-6">
             <div className="contact-thumb">
-              <img src="/estudy-assets/images/resource/contact.png" alt="" onError={(e) => {
-                (e.target as HTMLImageElement).src = '/estudy-assets/images/resource/about.png';
+              <img src="/lumina-assets/images/resource/contact.png" alt="" onError={(e) => {
+                (e.target as HTMLImageElement).src = '/lumina-assets/images/resource/about.png';
               }} />
             </div>
           </div>

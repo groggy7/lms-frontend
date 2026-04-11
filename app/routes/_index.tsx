@@ -1,48 +1,46 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from '@remix-run/react';
 
 export default function Home() {
-  useEffect(() => {
-    // Initialize any jQuery/Carousel plugins here if needed
-  }, []);
-
   return (
     <>
       {/* Start Banner Area */}
-      <div className="slider_list">
-        <div className="slider-area d-flex align-items-center">
-          <div className="slider-shape-area">
-            <div className="baner-shape1 bounce-animate">
-              <img src="/estudy-assets/images/slider/slider-shape.png" alt="" />
+      <div className="banner-area">
+        <div className="slider_list">
+          <div className="slider-area d-flex align-items-center" style={{ backgroundColor: '#001a33', position: 'relative', overflow: 'hidden' }}>
+            <div className="slider-shape-area">
+              <div className="baner-shape1 bounce-animate">
+                <img src="/lumina-assets/images/slider/slider-shape.png" alt="" />
+              </div>
+              <div className="baner-shape2 bounce-animate">
+                <img src="/lumina-assets/images/slider/slider-shape2.png" alt="" />
+              </div>
             </div>
-            <div className="baner-shape2 bounce-animate">
-              <img src="/estudy-assets/images/slider/slider-shape2.png" alt="" />
-            </div>
-          </div>
-          <div className="container">
-            <div className="row align-items-center">
-              <div className="col-lg-6">
-                <div className="slider-content">
-                  <div className="slider-sub-title">
-                    <h4>100% Satisfaction Guarantee</h4>
-                  </div>
-                  <div className="slider-main-title">
-                    <h1>Learn Skills From Our Top Instructors</h1>
-                  </div>
-                  <div className="main-btn slider1">
-                    <Link to="/courses" className="nest-btn slider1">
-                      <span className="nest-btn__shape slider"></span>
-                      <span className="nest-btn__shape slider"></span>
-                      <span className="nest-btn__shape slider"></span>
-                      <span className="nest-btn__shape slider"></span>
-                      <span className="nest-btn__text">Our Courses</span>
-                    </Link>
+            <div className="container" style={{ position: 'relative', zIndex: 5 }}>
+              <div className="row align-items-center">
+                <div className="col-lg-6">
+                  <div className="slider-content">
+                    <div className="slider-sub-title">
+                      <h4 className="text-blue-400">100% Satisfaction Guarantee</h4>
+                    </div>
+                    <div className="slider-main-title">
+                      <h1 className="text-white">Learn Skills From Our Top Instructors</h1>
+                    </div>
+                    <div className="main-btn slider1 mt-4">
+                      <Link to="/courses" className="nest-btn slider1">
+                        <span className="nest-btn__shape slider"></span>
+                        <span className="nest-btn__shape slider"></span>
+                        <span className="nest-btn__shape slider"></span>
+                        <span className="nest-btn__shape slider"></span>
+                        <span className="nest-btn__text">Our Courses</span>
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="col-lg-6">
-                <div className="slider-thumb">
-                  <img src="/estudy-assets/images/slider/slider-thumb.png" alt="" />
+                <div className="col-lg-6">
+                  <div className="slider-thumb">
+                    <img src="/lumina-assets/images/slider/slider-thumb.png" alt="" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -57,7 +55,7 @@ export default function Home() {
             <div className="col-lg-12">
               <div className="section-title">
                 <div className="section-title-shape">
-                  <img src="/estudy-assets/images/resource/section-shape.png" alt="" />
+                  <img src="/lumina-assets/images/resource/section-shape.png" alt="" />
                 </div>
                 <div className="section-sub-title">
                   <h4>Browse Categories</h4>
@@ -80,7 +78,7 @@ export default function Home() {
               <div key={i} className="col-lg-2 col-md-4 col-sm-6">
                 <div className="catagories-single-box">
                   <div className="catagories-thumb">
-                    <img src={`/estudy-assets/images/catagories/${cat.img}`} alt={cat.title} />
+                    <img src={`/lumina-assets/images/catagories/${cat.img}`} alt={cat.title} />
                     <div className="catagories-text">
                       <h4>Visit</h4>
                     </div>
@@ -95,47 +93,77 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Feature Section */}
+      {/* About Area */}
       <div className="about-area pt-100 pb-100">
         <div className="container">
           <div className="row align-items-center">
             <div className="col-lg-6">
               <div className="about-thumb">
-                <img src="/estudy-assets/images/resource/about.png" alt="" />
+                <img src="/lumina-assets/images/resource/about.png" alt="" />
+                <div className="about-shape bounce-animate">
+                  <img src="/lumina-assets/images/resource/section-shape.png" alt="" />
+                </div>
               </div>
             </div>
             <div className="col-lg-6">
               <div className="about-content">
                 <div className="section-title">
                   <div className="section-sub-title">
-                    <h4>About Our Engine</h4>
+                    <h4>About Lumina</h4>
                   </div>
                   <div className="section-main-title">
-                    <h2>Modern Video Delivery Infrastructure</h2>
+                    <h2>We Are Expert In Education Learning & LMS</h2>
                   </div>
                 </div>
                 <div className="about-text">
-                  <p>Our LMS Engine is built for scale, using Go and WebSockets for real-time state management and FFmpeg for adaptive bitrate streaming.</p>
+                  <p>Lumina leverages cutting-edge technology including Go, FFmpeg, and WebSockets to deliver a high-concurrency, real-time learning experience.</p>
                 </div>
                 <div className="about-list">
                   <ul>
-                    <li><i className="bi bi-check-circle-fill"></i> Chunked Video Uploads</li>
-                    <li><i className="bi bi-check-circle-fill"></i> Adaptive HLS Streaming</li>
-                    <li><i className="bi bi-check-circle-fill"></i> Real-time Progress Tracking</li>
-                    <li><i className="bi bi-check-circle-fill"></i> Dynamic PDF Watermarking</li>
+                    <li><i className="bi bi-check-circle-fill"></i> Professional & Experienced Instructors</li>
+                    <li><i className="bi bi-check-circle-fill"></i> Real-time Video Progress Sync</li>
+                    <li><i className="bi bi-check-circle-fill"></i> Dynamic PDF Watermarking System</li>
+                    <li><i className="bi bi-check-circle-fill"></i> Adaptive HLS Video Streaming</li>
                   </ul>
                 </div>
                 <div className="main-btn">
-                  <Link to="/learning" className="nest-btn">
+                  <Link to="/courses" className="nest-btn">
                     <span className="nest-btn__shape"></span>
                     <span className="nest-btn__shape"></span>
                     <span className="nest-btn__shape"></span>
                     <span className="nest-btn__shape"></span>
-                    <span className="nest-btn__text">Try Learning Engine</span>
+                    <span className="nest-btn__text">Discover More</span>
                   </Link>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Counter Area */}
+      <div className="counter-area">
+        <div className="container">
+          <div className="row counter-bg">
+            {[
+              { count: '30', label: 'Expert Instructors', icon: 'flaticon-graduation-cap' },
+              { count: '120', label: 'Online Courses', icon: 'flaticon-book' },
+              { count: '250', label: 'Students Learning', icon: 'flaticon-user' },
+              { count: '100', label: 'Satisfaction Rate', icon: 'flaticon-star' },
+            ].map((stat, i) => (
+              <div key={i} className="col-lg-3 col-md-6">
+                <div className="counter-single-box">
+                  <div className="counter-icon">
+                    <i className={stat.icon}></i>
+                  </div>
+                  <div className="counter-content">
+                    <h3 className="counter">{stat.count}</h3>
+                    <span>+</span>
+                    <p>{stat.label}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

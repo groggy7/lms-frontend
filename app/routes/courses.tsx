@@ -31,8 +31,8 @@ export default function Courses() {
             <div key={i} className="col-lg-4 col-md-6 mb-30">
               <div className="course-single-box">
                 <div className="course-thumb">
-                  <img src={`/estudy-assets/images/course/${course.img}`} alt={course.title} onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/estudy-assets/images/course/course1.png';
+                  <img src={`/lumina-assets/images/course/${course.img}`} alt={course.title} onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/lumina-assets/images/course/course1.png';
                   }} />
                   <div className="course-icon">
                     <i className="bi bi-heart"></i>
