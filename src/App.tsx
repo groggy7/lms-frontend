@@ -120,8 +120,9 @@ function App() {
               </div>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
+    </main>
       
       <footer className="mt-20 py-10 text-slate-500 text-sm border-t border-slate-900 w-full text-center">
         &copy; 2026 High-Concurrency Video Learning Engine POC
