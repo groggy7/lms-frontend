@@ -12,8 +12,8 @@ export default function Courses() {
   ];
 
   return (
-    <div className="course-area pt-100 pb-100 bg-white">
-      <div className="container">
+    <div className="course-area pb-100 bg-white min-h-screen">
+      <div className="container pt-16">
         <div className="row">
           <div className="col-lg-12">
             <div className="section-title text-center mb-50">

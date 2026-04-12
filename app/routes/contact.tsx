@@ -2,8 +2,8 @@ import React from 'react';
 
 export default function Contact() {
   return (
-    <div className="contact-area pt-100 pb-100">
-      <div className="container">
+    <div className="contact-area pb-100 bg-white min-h-screen">
+      <div className="container pt-16">
         <div className="row">
           <div className="col-lg-12">
             <div className="section-title text-center mb-50">

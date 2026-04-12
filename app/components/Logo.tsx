@@ -14,7 +14,7 @@ const Logo: React.FC<LogoProps> = ({
   textColor = "text-slate-800"
 }) => {
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
+    <div className={`flex items-center gap-3 no-underline ${className}`}>
       <div style={{ width: size, height: size }} className="relative flex-shrink-0">
         <svg
           viewBox="0 0 100 100"
@@ -33,7 +33,6 @@ const Logo: React.FC<LogoProps> = ({
             </filter>
           </defs>
           
-          {/* Main Logo Shape: A stylized 'L' combined with a spark/light mark */}
           <path
             d="M30 20C30 14.4772 34.4772 10 40 10H70C75.5228 10 80 14.4772 80 20V30C80 35.5228 75.5228 40 70 40H50V70C50 75.5228 45.5228 80 40 80H20C14.4772 80 10 75.5228 10 70V30C10 24.4772 14.4772 20 20 20H30Z"
             fill="url(#logo-gradient)"
@@ -62,7 +61,7 @@ const Logo: React.FC<LogoProps> = ({
       </div>
       
       {showText && (
-        <span className={`text-2xl font-black tracking-tight leading-none ${textColor} no-underline`}>
+        <span className={`text-2xl font-black tracking-tight leading-none ${textColor} no-underline border-none outline-none`}>
           Lumina<span className="text-blue-600">.</span>
         </span>
       )}

@@ -30,7 +30,7 @@ export default function Home() {
   return (
     <div className="bg-white text-slate-900 overflow-x-hidden">
       {/* Modern High-Impact Hero Section */}
-      <section className="relative min-h-[95vh] flex items-center py-24 overflow-hidden bg-[#000a12]">
+      <section className="relative min-h-[95vh] flex items-center pt-48 pb-24 overflow-hidden bg-[#000a12]">
         {/* Background effects */}
         <div className="absolute top-0 right-0 w-full h-full">
           <div className="absolute top-[-10%] left-[20%] w-[50%] h-[50%] bg-blue-600/20 rounded-full blur-[120px] animate-pulse" />
