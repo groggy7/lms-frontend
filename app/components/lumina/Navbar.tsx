@@ -40,7 +40,7 @@ const Navbar: React.FC = () => {
 
   const navLinks = [
     { name: 'Solutions', path: '/', dropdown: ['Enterprise', 'Scale', 'Security'] },
-    { name: 'Curriculums', path: '/courses' },
+    { name: 'Courses', path: '/courses' },
     { name: 'Infrastructure', path: '/' },
     { name: 'Contact', path: '/contact' },
   ];
@@ -80,8 +80,8 @@ const Navbar: React.FC = () => {
             <div className="hidden lg:flex items-center gap-8">
               {user ? (
                 <Link 
-                  to="/course/go-concurrency" 
-                  className="flex items-center gap-2.5 px-6 py-3 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20 hover:bg-blue-700 hover:-translate-y-0.5 transition-all no-underline"
+                  to="/console" 
+                  className="flex items-center gap-2.5 px-6 py-3 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:bg-blue-700 hover:-translate-y-0.5 transition-all no-underline"
                 >
                   <LayoutDashboard className="w-4 h-4" />
                   Console

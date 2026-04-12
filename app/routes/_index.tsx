@@ -219,7 +219,7 @@ export default function Home() {
           <div className="row">
             {[
               { count: '150', label: 'Global Partners', icon: 'flaticon-graduation-cap' },
-              { count: '850', label: 'Active Curriculums', icon: 'flaticon-book' },
+              { count: '850', label: 'Active Courses', icon: 'flaticon-book' },
               { count: '250k', label: 'Certified Alumni', icon: 'flaticon-user' },
               { count: '100', label: 'Satisfaction Rate', icon: 'flaticon-star' },
             ].map((stat, i) => (
