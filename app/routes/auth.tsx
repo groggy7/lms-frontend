@@ -12,40 +12,57 @@ export default function Auth() {
   
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setMessage(null);
 
-    // Pure client-side simulation for the prototype
-    setTimeout(() => {
-      const mockUser = {
-        id: "usr_" + Math.random().toString(36).substring(7),
-        email: email,
-        fullName: isLogin ? "Demo User" : fullName,
-        role: "instructor" // Keeping as instructor to show all UI features
-      };
+    const endpoint = isLogin ? 'http://localhost:8080/login' : 'http://localhost:8080/register';
+    const body = isLogin 
+      ? { email, password } 
+      : { email, password, fullName };
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Authentication failed');
+      }
 
       setMessage({ 
         text: isLogin ? 'Login successful! Redirecting...' : 'Account created successfully! Redirecting...', 
         isError: false 
       });
 
-      localStorage.setItem('lumina_user', JSON.stringify(mockUser));
-      localStorage.setItem('lumina_token', "prototype-token");
+      localStorage.setItem('lumina_user', JSON.stringify(data.user));
 
       setTimeout(() => {
         navigate('/course/go-concurrency');
       }, 1000);
+    } catch (err: any) {
+      setMessage({ 
+        text: err.message || 'Something went wrong', 
+        isError: true 
+      });
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
   };
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans text-slate-900">
       <div className="max-w-md w-full bg-white rounded-[32px] shadow-2xl shadow-blue-500/10 border border-slate-100 overflow-hidden">
         <div className="p-8 pb-0 flex justify-center">
-          <Link to="/">
+          <Link to="/" className="no-underline">
             <Logo size={50} />
           </Link>
         </div>
@@ -55,9 +72,6 @@ export default function Auth() {
             <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
               {isLogin ? 'Welcome Back' : 'Create Account'}
             </h2>
-            <p className="text-slate-500 mt-2">
-              Prototype Mode: Any email/password will work.
-            </p>
           </div>
 
           {message && (
