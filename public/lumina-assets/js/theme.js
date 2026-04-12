@@ -411,8 +411,11 @@ var dropdown = document.querySelectorAll('.dropdown');
 var dropdownArray = Array.prototype.slice.call(dropdown, 0);
 dropdownArray.forEach(function (el) {
     var button = el.querySelector('a[data-toggle="dropdown"]'),
-        menu = el.querySelector('.dropdown-menu'),
-        arrow = button.querySelector('i.icon-arrow');
+        menu = el.querySelector('.dropdown-menu');
+    
+    if (!button || !menu) return; // Skip if structure doesn't match legacy expectation
+    
+    var arrow = button.querySelector('i.icon-arrow');
 
     button.onclick = function (event) {
         if (!menu.hasClass('show')) {

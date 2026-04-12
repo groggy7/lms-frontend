@@ -46,14 +46,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const isMounted = useMounted();
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <Navbar />
         
         {children}
@@ -106,25 +106,29 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         
-        {/* Scripts from template */}
-        <script src="/lumina-assets/js/vendor/jquery-3.6.2.min.js"></script>
-        <script src="/lumina-assets/js/popper.min.js"></script>
-        <script src="/lumina-assets/js/bootstrap.min.js"></script>
-        <script src="/lumina-assets/js/owl.carousel.min.js"></script>
-        <script src="/lumina-assets/js/jquery.counterup.min.js"></script>
-        <script src="/lumina-assets/js/waypoints.min.js"></script>
-        <script src="/lumina-assets/js/wow.min.js"></script>
-        <script src="/lumina-assets/js/imagesloaded.pkgd.min.js"></script>
-        <script src="/lumina-assets/venobox/venobox.js"></script>
-        <script src="/lumina-assets/js/animated-text.js"></script>
-        <script src="/lumina-assets/js/isotope.pkgd.min.js"></script>
-        <script src="/lumina-assets/js/jquery.meanmenu.js"></script>
-        <script src="/lumina-assets/js/jquery.scrollUp.js"></script>
-        <script src="/lumina-assets/js/jquery.barfiller.js"></script>
-        <script src="/lumina-assets/js/rangeslider.js"></script>
-        <script src="/lumina-assets/js/mixitup.min.js"></script>
-        <script src="/lumina-assets/js/theme.js"></script>
-        <script src="/lumina-assets/js/script.js"></script>
+        {/* Scripts from template - Loaded only on client to avoid hydration mismatch */}
+        {isMounted && (
+          <>
+            <script src="/lumina-assets/js/vendor/jquery-3.6.2.min.js"></script>
+            <script src="/lumina-assets/js/popper.min.js"></script>
+            <script src="/lumina-assets/js/bootstrap.min.js"></script>
+            <script src="/lumina-assets/js/owl.carousel.min.js"></script>
+            <script src="/lumina-assets/js/jquery.counterup.min.js"></script>
+            <script src="/lumina-assets/js/waypoints.min.js"></script>
+            <script src="/lumina-assets/js/wow.min.js"></script>
+            <script src="/lumina-assets/js/imagesloaded.pkgd.min.js"></script>
+            <script src="/lumina-assets/venobox/venobox.js"></script>
+            <script src="/lumina-assets/js/animated-text.js"></script>
+            <script src="/lumina-assets/js/isotope.pkgd.min.js"></script>
+            <script src="/lumina-assets/js/jquery.meanmenu.js"></script>
+            <script src="/lumina-assets/js/jquery.scrollUp.js"></script>
+            <script src="/lumina-assets/js/jquery.barfiller.js"></script>
+            <script src="/lumina-assets/js/rangeslider.js"></script>
+            <script src="/lumina-assets/js/mixitup.min.js"></script>
+            <script src="/lumina-assets/js/theme.js"></script>
+            <script src="/lumina-assets/js/script.js"></script>
+          </>
+        )}
 
         <ScrollRestoration />
         <Scripts />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Plus, 
   Search, 
@@ -11,19 +11,83 @@ import {
   Users,
   Clock,
   CheckCircle2,
-  Settings
+  Settings,
+  Loader2,
+  Trash2,
+  Globe,
+  Archive
 } from 'lucide-react';
 import { Link } from '@remix-run/react';
 
-export default function ConsoleIndex() {
-  const [searchTerm, setSearchInput] = useState('');
+interface ManagedCourse {
+  id: string;
+  title: string;
+  status: string;
+  updatedAt: string;
+}
 
-  // Mock data for managed courses
-  const managedCourses = [
-    { id: '1', title: 'Modern System Concurrency Architectures', status: 'Published', students: 1240, type: 'video', updated: '2 days ago' },
-    { id: '2', title: 'Advanced Cloud Infrastructure Patterns', status: 'Published', students: 856, type: 'document', updated: '5 days ago' },
-    { id: '3', title: 'Neural Network Scaling Strategies', status: 'Draft', students: 0, type: 'video', updated: 'Just now' },
-  ];
+export default function ConsoleIndex() {
+  const [courses, setCourses] = useState<ManagedCourse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchManagedCourses();
+  }, []);
+
+  async function fetchManagedCourses() {
+    try {
+      setIsLoading(true);
+      const response = await fetch('http://localhost:8080/courses', {
+        credentials: 'include'
+      });
+      if (!response.ok) throw new Error('Failed to synchronize with management nodes');
+      const data = await response.json();
+      setCourses(data || []);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const deleteCourse = async (id: string) => {
+    if (!confirm('Are you sure you want to decommission this course node? This action is permanent.')) return;
+    
+    setIsProcessing(id);
+    try {
+      const res = await fetch(`http://localhost:8080/courses/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (!res.ok) throw new Error('Failed to delete node');
+      setCourses(prev => prev.filter(c => c.id !== id));
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setIsProcessing(null);
+    }
+  };
+
+  const toggleStatus = async (course: ManagedCourse) => {
+    const newStatus = course.status === 'published' ? 'draft' : 'published';
+    setIsProcessing(course.id);
+    try {
+      const res = await fetch(`http://localhost:8080/courses/${course.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...course, status: newStatus }),
+        credentials: 'include'
+      });
+      if (!res.ok) throw new Error('Failed to update node status');
+      setCourses(prev => prev.map(c => c.id === course.id ? { ...c, status: newStatus } : c));
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setIsProcessing(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white pb-20 overflow-x-hidden">
@@ -56,7 +120,7 @@ export default function ConsoleIndex() {
                 { label: 'Total Students', value: '2,096', icon: <Users /> },
                 { label: 'Avg. Completion', value: '84%', icon: <CheckCircle2 /> },
                 { label: 'Stream Time', value: '142h', icon: <Clock /> },
-                { label: 'Infrastructure', value: 'Peak', icon: <BarChart3 /> },
+                { label: 'Infrastructure', value: 'Optimal', icon: <BarChart3 /> },
               ].map((stat, i) => (
                 <div key={i} className="p-6 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-sm">
                   <div className="flex items-center gap-3 mb-3 text-blue-400">
@@ -93,61 +157,94 @@ export default function ConsoleIndex() {
 
             {/* Course List */}
             <div className="divide-y divide-slate-50">
-              {managedCourses.map((course) => (
-                <div key={course.id} className="p-8 hover:bg-slate-50/80 transition-colors group">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex items-center gap-6 flex-1">
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm transition-transform group-hover:scale-110 ${
-                        course.type === 'video' ? 'bg-blue-50 text-blue-600' : 'bg-indigo-50 text-indigo-600'
-                      }`}>
-                        {course.type === 'video' ? <Video size={24} /> : <FileText size={24} />}
-                      </div>
-                      <div className="space-y-1">
-                        <h3 className="text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors">{course.title}</h3>
-                        <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                          <span className="flex items-center gap-1.5">
-                            <Users size={12} className="text-slate-300" />
-                            {course.students} Learners
-                          </span>
-                          <span className="w-1 h-1 rounded-full bg-slate-200" />
-                          <span className="flex items-center gap-1.5 text-blue-500">
-                            Updated {course.updated}
-                          </span>
+              {isLoading ? (
+                <div className="p-20 flex flex-col items-center justify-center gap-4 text-slate-300">
+                  <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em]">Synchronizing Nodes...</p>
+                </div>
+              ) : error ? (
+                <div className="p-20 text-center">
+                  <p className="text-red-500 font-bold text-sm italic">{error}</p>
+                </div>
+              ) : courses.length === 0 ? (
+                <div className="p-20 flex flex-col items-center justify-center gap-4 text-slate-300">
+                  <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center border-2 border-dashed border-slate-200">
+                    <Plus size={32} className="opacity-20" />
+                  </div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em]">No active courses found</p>
+                </div>
+              ) : (
+                courses.map((course) => (
+                  <div key={course.id} className={`p-8 hover:bg-slate-50/80 transition-colors group ${isProcessing === course.id ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                      <div className="flex items-center gap-6 flex-1">
+                        <div className={`w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shadow-sm transition-transform group-hover:scale-110`}>
+                          <Video size={24} />
+                        </div>
+                        <div className="space-y-1">
+                          <h3 className="text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors">{course.title}</h3>
+                          <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                            <span className="flex items-center gap-1.5">
+                              <Users size={12} className="text-slate-300" />
+                              Dynamic Learners
+                            </span>
+                            <span className="w-1 h-1 rounded-full bg-slate-200" />
+                            <span className="flex items-center gap-1.5 text-blue-500">
+                              Revision: {new Date(course.updatedAt).toLocaleDateString()}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-center gap-6">
-                      <div className="text-right hidden md:block">
-                        <p className={`text-[9px] font-black uppercase tracking-[0.2em] mb-1 ${
-                          course.status === 'Published' ? 'text-green-500' : 'text-orange-400'
-                        }`}>
-                          {course.status}
-                        </p>
-                        <div className="flex gap-1 justify-end">
-                          {[1, 2, 3, 4, 5].map(i => (
-                            <div key={i} className={`w-3 h-1 rounded-full ${i <= 4 ? 'bg-blue-600' : 'bg-slate-100'}`} />
-                          ))}
+                      <div className="flex items-center gap-6">
+                        <div className="text-right hidden md:block">
+                          <p className={`text-[9px] font-black uppercase tracking-[0.2em] mb-1 ${
+                            course.status === 'published' ? 'text-green-500' : 'text-orange-400'
+                          }`}>
+                            {course.status}
+                          </p>
+                          <div className="flex gap-1 justify-end">
+                            {[1, 2, 3, 4, 5].map(i => (
+                              <div key={i} className={`w-3 h-1 rounded-full ${i <= 4 ? 'bg-blue-600' : 'bg-slate-100'}`} />
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <button className="p-3 hover:bg-white hover:shadow-md rounded-xl text-slate-400 hover:text-slate-900 transition-all">
-                          <Settings size={18} />
-                        </button>
-                        <button className="p-3 hover:bg-white hover:shadow-md rounded-xl text-slate-400 hover:text-slate-900 transition-all">
-                          <MoreVertical size={18} />
-                        </button>
+                        
+                        <div className="flex items-center gap-2">
+                          <button 
+                            onClick={() => toggleStatus(course)}
+                            title={course.status === 'published' ? 'Revert to Draft' : 'Publish Course'}
+                            className="p-3 hover:bg-white hover:shadow-md rounded-xl text-slate-400 hover:text-blue-600 transition-all"
+                          >
+                            {course.status === 'published' ? <Archive size={18} /> : <Globe size={18} />}
+                          </button>
+                          <Link to={`/console/edit-course/${course.id}`} className="p-3 hover:bg-white hover:shadow-md rounded-xl text-slate-400 hover:text-slate-900 transition-all">
+                            <Settings size={18} />
+                          </Link>
+                          <button 
+                            onClick={() => deleteCourse(course.id)}
+                            className="p-3 hover:bg-white hover:shadow-md rounded-xl text-slate-400 hover:text-red-600 transition-all"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
-            {/* Empty State / Footer */}
-            <div className="p-8 bg-slate-50/30 text-center">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300">
+            {/* Empty State / Footer with Save Action */}
+            <div className="p-10 bg-slate-50/30 flex flex-col items-center gap-6 border-t border-slate-50">
+              <button 
+                onClick={() => alert('Infrastructure state synchronized successfully.')}
+                className="px-10 py-3 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-xl shadow-slate-900/10 flex items-center gap-2"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                Save System State
+              </button>
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-300">
                 End of Infrastructure Index
               </p>
             </div>

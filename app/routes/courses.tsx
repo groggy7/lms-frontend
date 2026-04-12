@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from '@remix-run/react';
-import { Book, Clock, PlayCircle, Heart, Star, Loader2 } from 'lucide-react';
+import { Book, Clock, PlayCircle, Loader2 } from 'lucide-react';
 
 interface Course {
   id: string;
@@ -91,7 +91,7 @@ export default function Courses() {
                           <Link to={`/course/${course.id}`} className="no-underline">{course.title}</Link>
                         </h3>
                         <p className="text-slate-500 text-xs font-medium leading-relaxed line-clamp-2">
-                          {course.description || "Comprehensive enterprise curriculum designed for high-concurrency systems and architectural scaling."}
+                          {course.description || "Comprehensive enterprise course designed for high-concurrency systems and architectural scaling."}
                         </p>
                       </div>
 
@@ -100,8 +100,8 @@ export default function Courses() {
                           <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Verification</span>
                           <span className="text-xs font-black text-blue-600 italic">Lumina Verified</span>
                         </div>
-                        <Link 
-                          to={`/course/${course.id}`} 
+                        <Link
+                          to={`/course/${course.id}`}
                           className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all no-underline shadow-lg shadow-slate-900/10"
                         >
                           Access Node
