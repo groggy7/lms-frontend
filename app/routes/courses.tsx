@@ -33,8 +33,8 @@ export default function Courses() {
         </div>
         <div className="row">
           {courses.map((course, i) => (
-            <div key={i} className="col-lg-4 col-md-6 mb-30">
-              <div className="course-single-box shadow-sm hover:shadow-lg transition-all rounded-2xl overflow-hidden border border-slate-100">
+            <div key={i} className="col-lg-4 col-md-6 mb-30 flex">
+              <div className="course-single-box shadow-sm hover:shadow-lg transition-all rounded-2xl overflow-hidden border border-slate-100 flex flex-col w-full bg-white">
                 <div className="course-thumb">
                   {/* Template CSS expects two images for the hover transition effect */}
                   <img src={`/lumina-assets/images/course/${course.img}`} alt={course.title} onError={(e) => {
@@ -61,22 +61,24 @@ export default function Courses() {
                     </div>
                   </div>
                 </div>
-                <div className="course-content p-6">
-                  <div className="course-meta flex items-center gap-4 text-slate-500 text-sm mb-3">
-                    <span className="flex items-center gap-1"><i className="bi bi-book text-blue-600"></i> {course.lessons} Lesson</span>
-                    <span className="flex items-center gap-1"><i className="bi bi-clock text-blue-600"></i> {course.duration}</span>
-                  </div>
-                  <div className="course-title">
-                    <h4 className="text-xl font-bold text-slate-800 hover:text-blue-600 transition-colors mb-4">
-                      <Link to="/course/go-concurrency">{course.title}</Link>
-                    </h4>
+                <div className="course-content p-6 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="course-meta flex items-center gap-4 text-slate-500 text-sm mb-3">
+                      <span className="flex items-center gap-1"><i className="bi bi-book text-blue-600"></i> {course.lessons} Lesson</span>
+                      <span className="flex items-center gap-1"><i className="bi bi-clock text-blue-600"></i> {course.duration}</span>
+                    </div>
+                    <div className="course-title">
+                      <h4 className="text-xl font-bold text-slate-800 hover:text-blue-600 transition-colors mb-4">
+                        <Link to="/course/go-concurrency" className="no-underline">{course.title}</Link>
+                      </h4>
+                    </div>
                   </div>
                   <div className="course-bottom flex items-center justify-between border-t border-slate-50 pt-4">
                     <div className="course-price text-2xl font-bold text-blue-600">
                       <span>{course.price}</span>
                     </div>
                     <div className="course-cart">
-                      <Link to="/course/go-concurrency" className="text-slate-700 font-semibold hover:text-blue-600 flex items-center gap-1 text-sm">
+                      <Link to="/course/go-concurrency" className="text-slate-700 font-semibold hover:text-blue-600 flex items-center gap-1 text-sm no-underline">
                         <i className="bi bi-play-fill"></i> Start Learning
                       </Link>
                     </div>
