@@ -73,12 +73,10 @@ export default function Home() {
             {[
               { title: 'Online Course', img: 'catagories1.png' },
               { title: 'Web Design', img: 'catagories2.png' },
-              { title: 'Graphic Design', img: 'catagories3.png' },
-              { title: 'Art & Humanities', img: 'catagories4.png' },
               { title: 'Mobile Application', img: 'catagories5.png' },
               { title: 'Development', img: 'catagories6.png' },
             ].map((cat, i) => (
-              <div key={i} className="col-lg-2 col-md-4 col-sm-6">
+              <div key={i} className="col-lg-3 col-md-6 col-sm-6">
                 <div className="catagories-single-box">
                   <div className="catagories-thumb">
                     <img src={`/lumina-assets/images/catagories/${cat.img}`} alt={cat.title} />
