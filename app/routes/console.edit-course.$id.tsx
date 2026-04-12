@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { Link, useParams, useNavigate } from '@remix-run/react';
 
+import RichTextEditor from '../components/RichTextEditor';
+
 type ContentType = 'video' | 'document' | 'text';
 
 interface Lesson {
@@ -279,15 +281,15 @@ export default function EditCourse() {
 
               {newLessonType === 'text' ? (
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Text Content</label>
-                  <textarea 
+                  <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Rich Content (Markdown/Text)</label>
+                  <RichTextEditor 
                     value={newLessonText}
-                    onChange={(e) => setNewLessonText(e.target.value)}
-                    placeholder="Enter module content..."
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-xs font-medium min-h-[100px] resize-none"
+                    onChange={setNewLessonText}
+                    placeholder="Start writing..."
                   />
                 </div>
               ) : (
+
                 <div className="space-y-2">
                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Asset Source</label>
                   <div className="relative">
@@ -319,10 +321,9 @@ export default function EditCourse() {
                         <span className="text-[9px] font-black uppercase text-blue-600">Editing Mode</span>
                         <button onClick={() => setEditingLessonId(null)}><X size={14} className="text-slate-400" /></button>
                       </div>
-                      <textarea 
+                      <RichTextEditor 
                         value={editingText}
-                        onChange={(e) => setEditingText(e.target.value)}
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-xs font-medium min-h-[150px] resize-none"
+                        onChange={setEditingText}
                       />
                       <div className="flex justify-end gap-2">
                         <button onClick={() => setEditingLessonId(null)} className="text-[10px] font-black uppercase text-slate-400 px-3">Cancel</button>
