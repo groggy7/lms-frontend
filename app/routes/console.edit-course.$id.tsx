@@ -300,20 +300,21 @@ export default function EditCourse() {
     const newContents = arrayMove(course.contents, oldIndex, newIndex);
     setCourse({ ...course, contents: newContents });
 
-    // Sync new order to backend (sequential for now, bulk is better but requires new endpoint)
+    // Sync new order to backend via BULK reorder
     setIsProcessing(true);
     try {
-      for (let i = 0; i < newContents.length; i++) {
-        const item = newContents[i];
-        await fetch(`http://localhost:8080/courses/${id}/lessons/${item.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...item, orderIndex: i }),
-          credentials: 'include'
-        });
-      }
-    } catch (err) {
+      const res = await fetch(`http://localhost:8080/courses/${id}/lessons/reorder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lessonIds: newContents.map(l => l.id) }),
+        credentials: 'include'
+      });
+      if (!res.ok) throw new Error('Failed to synchronize curriculum order');
+    } catch (err: any) {
       console.error('Failed to sync order:', err);
+      alert(err.message);
+      // Revert UI on failure
+      setCourse(course); 
     } finally {
       setIsProcessing(false);
     }
