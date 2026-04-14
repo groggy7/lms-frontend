@@ -515,7 +515,7 @@ export default function EditCourse() {
                 className="px-12 py-4 bg-slate-900 text-white rounded-[24px] font-black text-xs uppercase tracking-[0.3em] hover:bg-blue-600 transition-all shadow-2xl shadow-slate-900/10 flex items-center gap-3"
               >
                 <CheckCircle2 className="w-5 h-5" />
-                Finalize System State
+                Save
               </button>
             </div>
           </div>
