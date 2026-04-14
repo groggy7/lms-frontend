@@ -1,14 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  LayoutDashboard, 
-  Video, 
-  FileText, 
-  AlignLeft, 
-  ArrowRight, 
-  ArrowLeft, 
-  CloudUpload, 
-  CheckCircle2, 
-  Loader2,
+import { useState, useEffect } from 'react';
+import {
+  Video,
+  FileText,
+  AlignLeft,
+  ArrowLeft,
+  CheckCircle2,
   Plus,
   Trash2,
   GripVertical,
@@ -23,6 +19,7 @@ import { Link, useParams, useNavigate } from '@remix-run/react';
 import * as dndCore from '@dnd-kit/core';
 import * as dndSortable from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { getApiUrl } from '../lib/config';
 
 const { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } = dndCore;
 const { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } = dndSortable;
@@ -61,15 +58,15 @@ interface SortableItemProps {
   deleteLesson: (id: string) => void;
 }
 
-function SortableLessonItem({ 
-  lesson, 
-  idx, 
-  editingLessonId, 
-  editingText, 
-  setEditingText, 
-  setEditingLessonId, 
-  saveTextLesson, 
-  deleteLesson 
+function SortableLessonItem({
+  lesson,
+  idx,
+  editingLessonId,
+  editingText,
+  setEditingText,
+  setEditingLessonId,
+  saveTextLesson,
+  deleteLesson
 }: SortableItemProps) {
   const {
     attributes,
@@ -88,9 +85,9 @@ function SortableLessonItem({
   };
 
   return (
-    <div 
-      ref={setNodeRef} 
-      style={style} 
+    <div
+      ref={setNodeRef}
+      style={style}
       className="bg-white rounded-[32px] p-6 border border-slate-100 flex flex-col gap-6 group hover:border-blue-200 transition-all shadow-md"
     >
       {editingLessonId === lesson.id ? (
@@ -99,14 +96,14 @@ function SortableLessonItem({
             <span className="text-xs font-black uppercase text-blue-600 tracking-widest">Editing Mode: {lesson.title}</span>
             <button onClick={() => setEditingLessonId(null)}><X size={18} className="text-slate-400 hover:text-slate-900 transition-colors" /></button>
           </div>
-          <RichTextEditor 
+          <RichTextEditor
             value={editingText}
             onChange={setEditingText}
           />
           <div className="flex justify-end gap-4">
             <button onClick={() => setEditingLessonId(null)} className="text-xs font-black uppercase text-slate-400 px-4 hover:text-slate-900 transition-colors">Cancel</button>
-            <button 
-              onClick={() => saveTextLesson(lesson)} 
+            <button
+              onClick={() => saveTextLesson(lesson)}
               className="bg-slate-900 text-white px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-600 transition-all"
             >
               Save Module
@@ -115,9 +112,9 @@ function SortableLessonItem({
         </div>
       ) : (
         <div className="flex items-center gap-6">
-          <button 
-            {...attributes} 
-            {...listeners} 
+          <button
+            {...attributes}
+            {...listeners}
             className="p-2 cursor-grab active:cursor-grabbing hover:bg-slate-50 rounded-lg transition-colors"
           >
             <GripVertical className="w-5 h-5 text-slate-300" />
@@ -139,18 +136,18 @@ function SortableLessonItem({
           </div>
           <div className="flex items-center gap-2">
             {lesson.type === 'text' && (
-              <button 
-                onClick={() => { 
-                  setEditingLessonId(lesson.id); 
-                  setEditingText(lesson.contentBody || ''); 
-                }} 
+              <button
+                onClick={() => {
+                  setEditingLessonId(lesson.id);
+                  setEditingText(lesson.contentBody || '');
+                }}
                 className="p-3 text-slate-300 hover:text-blue-600 transition-colors bg-slate-50 rounded-xl"
               >
                 <Edit3 size={20} />
               </button>
             )}
-            <button 
-              onClick={() => deleteLesson(lesson.id)} 
+            <button
+              onClick={() => deleteLesson(lesson.id)}
               className="p-3 text-slate-300 hover:text-red-500 transition-colors bg-slate-50 rounded-xl"
             >
               <Trash2 size={20} />
@@ -165,11 +162,11 @@ function SortableLessonItem({
 export default function EditCourse() {
   const { id } = useParams();
   const navigate = useNavigate();
-  
+
   const [course, setCourse] = useState<Course | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
-  
+
   // New Lesson Drafting
   const [newLessonTitle, setNewLessonTitle] = useState('');
   const [newLessonType, setNewLessonType] = useState<ContentType>('video');
@@ -234,7 +231,7 @@ export default function EditCourse() {
       formData.append('title', newLessonTitle);
       formData.append('type', newLessonType);
       formData.append('orderIndex', (course.contents?.length || 0).toString());
-      
+
       if (newLessonType === 'text') {
         formData.append('contentBody', newLessonText);
       } else if (selectedFile) {
@@ -314,7 +311,7 @@ export default function EditCourse() {
       console.error('Failed to sync order:', err);
       alert(err.message);
       // Revert UI on failure
-      setCourse(course); 
+      setCourse(course);
     } finally {
       setIsProcessing(false);
     }
@@ -343,8 +340,8 @@ export default function EditCourse() {
               </h1>
               <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Deployment ID: {course.id}</p>
             </div>
-            <Link 
-              to="/console" 
+            <Link
+              to="/console"
               className="px-5 py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 text-white rounded-xl transition-all flex items-center gap-2 font-black text-xs uppercase tracking-widest no-underline"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
@@ -356,7 +353,7 @@ export default function EditCourse() {
 
       <div className="container mx-auto px-4 mt-8 relative z-20">
         <div className="max-w-4xl mx-auto space-y-8">
-          
+
           {/* Section 1: Meta */}
           <div className={`${isProcessing ? 'opacity-50 pointer-events-none' : ''} bg-slate-50 rounded-[48px] p-10 lg:p-12 border border-slate-100 space-y-8 transition-opacity shadow-2xl shadow-slate-200/40`}>
             <div className="space-y-2">
@@ -365,20 +362,20 @@ export default function EditCourse() {
               </h2>
               <p className="text-slate-500 text-sm font-medium opacity-80">Update the foundational identity of your infrastructure node.</p>
             </div>
-            
+
             <div className="space-y-6">
               <div className="space-y-3">
                 <label className="text-[13px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Course Title</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={course.title}
                   onChange={(e) => setCourse({ ...course, title: e.target.value })}
-                  className="w-full px-6 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-black text-2xl text-slate-900 shadow-sm" 
+                  className="w-full px-6 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-black text-2xl text-slate-900 shadow-sm"
                 />
               </div>
               <div className="space-y-3">
                 <label className="text-[13px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Description</label>
-                <textarea 
+                <textarea
                   rows={3}
                   value={course.description}
                   onChange={(e) => setCourse({ ...course, description: e.target.value })}
@@ -386,7 +383,7 @@ export default function EditCourse() {
                 ></textarea>
               </div>
               <div className="pt-2">
-                <button 
+                <button
                   onClick={handleUpdateMeta}
                   className="px-10 py-3 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center gap-2 shadow-xl shadow-slate-900/10"
                 >
@@ -408,8 +405,8 @@ export default function EditCourse() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
                   <label className="text-[13px] font-black uppercase tracking-widest text-slate-400 ml-1">Module Title</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={newLessonTitle}
                     onChange={(e) => setNewLessonTitle(e.target.value)}
                     placeholder="New Module Title..."
@@ -419,7 +416,7 @@ export default function EditCourse() {
                 <div className="space-y-3">
                   <label className="text-[13px] font-black uppercase tracking-widest text-slate-400 ml-1">Module Format</label>
                   <div className="relative">
-                    <select 
+                    <select
                       value={newLessonType}
                       onChange={(e) => setNewLessonType(e.target.value as ContentType)}
                       className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl outline-none text-xs font-black uppercase tracking-widest appearance-none cursor-pointer pr-12 shadow-inner"
@@ -436,7 +433,7 @@ export default function EditCourse() {
               {newLessonType === 'text' ? (
                 <div className="space-y-3">
                   <label className="text-[13px] font-black uppercase tracking-widest text-slate-400 ml-1">Interactive Content</label>
-                  <RichTextEditor 
+                  <RichTextEditor
                     value={newLessonText}
                     onChange={setNewLessonText}
                     placeholder="Architect your interactive module content here..."
@@ -463,7 +460,7 @@ export default function EditCourse() {
               )}
 
               <div className="flex justify-end">
-                <button 
+                <button
                   onClick={addLesson}
                   disabled={isProcessing || !newLessonTitle || (newLessonType === 'text' ? !newLessonText : !selectedFile)}
                   className="px-10 py-3.5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-blue-700 disabled:opacity-30 transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-600/20"
@@ -479,21 +476,21 @@ export default function EditCourse() {
                 <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Deployed Modules</span>
                 <span className="text-[10px] font-black text-blue-600 bg-blue-100 px-3 py-1 rounded-full uppercase tracking-widest">Live Index</span>
               </div>
-              
-              <DndContext 
+
+              <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
                 onDragEnd={handleDragEnd}
               >
-                <SortableContext 
+                <SortableContext
                   items={course.contents.map(l => l.id)}
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="space-y-4">
                     {course.contents.map((lesson, idx) => (
-                      <SortableLessonItem 
-                        key={lesson.id} 
-                        lesson={lesson} 
+                      <SortableLessonItem
+                        key={lesson.id}
+                        lesson={lesson}
                         idx={idx}
                         editingLessonId={editingLessonId}
                         editingText={editingText}
@@ -510,22 +507,13 @@ export default function EditCourse() {
 
             {/* Save System State Button */}
             <div className="pt-10 border-t border-slate-100 flex justify-center">
-              <button 
+              <button
                 onClick={() => navigate('/console')}
                 className="px-12 py-4 bg-slate-900 text-white rounded-[24px] font-black text-xs uppercase tracking-[0.3em] hover:bg-blue-600 transition-all shadow-2xl shadow-slate-900/10 flex items-center gap-3"
               >
                 <CheckCircle2 className="w-5 h-5" />
                 Save
               </button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  );
-}
->
             </div>
           </div>
 

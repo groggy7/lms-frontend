@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from '@remix-run/react';
 import Logo from '../components/Logo';
+import { getApiUrl } from '../lib/config';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -154,12 +155,6 @@ export default function Auth() {
               </button>
             </p>
           </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-    </div>
         </div>
       </div>
     </div>

@@ -18,6 +18,7 @@ import {
   Archive
 } from 'lucide-react';
 import { Link } from '@remix-run/react';
+import { getApiUrl } from '../lib/config';
 
 interface ManagedCourse {
   id: string;
@@ -39,7 +40,7 @@ export default function ConsoleIndex() {
   async function fetchManagedCourses() {
     try {
       setIsLoading(true);
-      const response = await fetch('http://localhost:8080/courses', {
+      const response = await fetch(`${getApiUrl()}/courses`, {
         credentials: 'include'
       });
       if (!response.ok) throw new Error('Failed to synchronize with management nodes');
@@ -57,7 +58,7 @@ export default function ConsoleIndex() {
     
     setIsProcessing(id);
     try {
-      const res = await fetch(`http://localhost:8080/courses/${id}`, {
+      const res = await fetch(`${getApiUrl()}/courses/${id}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -74,7 +75,7 @@ export default function ConsoleIndex() {
     const newStatus = course.status === 'published' ? 'draft' : 'published';
     setIsProcessing(course.id);
     try {
-      const res = await fetch(`http://localhost:8080/courses/${course.id}`, {
+      const res = await fetch(`${getApiUrl()}/courses/${course.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...course, status: newStatus }),

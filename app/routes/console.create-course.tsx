@@ -19,6 +19,7 @@ import {
   Image as ImageIcon
 } from 'lucide-react';
 import { Link } from '@remix-run/react';
+import { getApiUrl } from '../lib/config';
 
 import RichTextEditor from '../components/RichTextEditor';
 
@@ -117,7 +118,7 @@ export default function CreateCourse() {
     formData.append('document', file); // Reuse the generic upload endpoint for now
 
     try {
-      const res = await fetch('http://localhost:8080/upload/document', {
+      const res = await fetch(`${getApiUrl()}/upload/document`, {
         method: 'POST',
         body: formData,
         credentials: 'include',
@@ -169,7 +170,7 @@ export default function CreateCourse() {
           formData.append('asset', lessons[i].file);
         }
 
-        const lessonRes = await fetch(`http://localhost:8080/courses/${createdCourse.id}/lessons`, {
+        const lessonRes = await fetch(`${getApiUrl()}/courses/${createdCourse.id}/lessons`, {
           method: 'POST',
           body: formData,
           credentials: 'include',
@@ -602,12 +603,6 @@ export default function CreateCourse() {
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300">Enterprise High-Resolution Catalog</p>
             </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
-}
- </div>
         </div>
       )}
     </div>

@@ -8,6 +8,7 @@ import { marked } from 'marked'
 import { markedHighlight } from "marked-highlight";
 import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark.css'
+import { getApiUrl } from '../lib/config'
 
 // Configure marked with highlight.js using marked-highlight
 marked.use(markedHighlight({
@@ -123,7 +124,8 @@ export default function CourseDetails() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-20 text-slate-900">
       {/* Course Top Header */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .hljs, .ql-syntax {
           padding: 1.5rem !important;
           border-radius: 1.25rem !important;
@@ -269,12 +271,6 @@ export default function CourseDetails() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-iv>
         </div>
       </div>
     </div>
