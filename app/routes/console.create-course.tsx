@@ -15,7 +15,8 @@ import {
   ChevronDown,
   X,
   FileUp,
-  Type
+  Type,
+  Image as ImageIcon
 } from 'lucide-react';
 import { Link } from '@remix-run/react';
 
@@ -35,6 +36,7 @@ export default function CreateCourse() {
   const [step, setStep] = useState(1);
   const [courseName, setCourseName] = useState('');
   const [courseDesc, setCourseDesc] = useState('');
+  const [thumbnailUrl, setThumbnailUrl] = useState('');
   
   // Lessons State
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -48,6 +50,24 @@ export default function CreateCourse() {
   const [currentUploadingIndex, setCurrentUploadingIndex] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
 
+  const [showStockSelector, setShowStockSelector] = useState(false);
+
+  // High-quality stock images for the catalog
+  const stockThumbnails = [
+    "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=400&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=400&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=400&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=400&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=400&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=400&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?q=80&w=400&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1504639725590-34d0984388bd?q=80&w=400&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=400&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1516116216624-53e697fedbea?q=80&w=400&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=400&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=400&auto=format&fit=crop"
+  ];
+
   // Auto-start upload when reaching step 3
   useEffect(() => {
     if (step === 3 && !isUploading && !isComplete) {
@@ -60,7 +80,6 @@ export default function CreateCourse() {
 
   const addLesson = () => {
     if (!newLessonTitle) return;
-    
     const newLesson: Lesson = {
       id: Math.random().toString(36).substr(2, 9),
       title: newLessonTitle,
@@ -68,9 +87,7 @@ export default function CreateCourse() {
       content: newLessonType === 'text' ? newLessonText : selectedFile?.name,
       file: selectedFile || undefined
     };
-
     setLessons([...lessons, newLesson]);
-    
     setNewLessonTitle('');
     setNewLessonText('');
     setSelectedFile(null);
@@ -78,6 +95,29 @@ export default function CreateCourse() {
 
   const removeLesson = (id: string) => {
     setLessons(lessons.filter(l => l.id !== id));
+  };
+
+  const handleCustomThumbnail = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Simulate resizing/minimizing before upload (In real app, use canvas or backend)
+    // For now, we upload it directly to R2 via a dedicated endpoint or reuse lesson flow
+    const formData = new FormData();
+    formData.append('document', file); // Reuse the generic upload endpoint for now
+
+    try {
+      const res = await fetch('http://localhost:8080/upload/document', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to upload custom thumbnail');
+      const data = await res.json();
+      setThumbnailUrl(data.location);
+    } catch (err: any) {
+      alert(err.message);
+    }
   };
 
   const simulateUpload = async () => {
@@ -91,6 +131,7 @@ export default function CreateCourse() {
         body: JSON.stringify({
           title: courseName,
           description: courseDesc,
+          thumbnailUrl: thumbnailUrl,
           status: 'draft'
         }),
         credentials: 'include',
@@ -136,7 +177,7 @@ export default function CreateCourse() {
     } catch (err: any) {
       alert(err.message || 'Deployment failed');
       setIsUploading(false);
-      setStep(2); // Go back to fix issues
+      setStep(2);
     }
   };
 
@@ -144,6 +185,7 @@ export default function CreateCourse() {
     setStep(1);
     setCourseName('');
     setCourseDesc('');
+    setThumbnailUrl('');
     setLessons([]);
     setIsUploading(false);
     setUploadProgress(0);
@@ -204,31 +246,63 @@ export default function CreateCourse() {
                 </div>
                 
                 <div className="space-y-6">
-                  <div className="space-y-3">
-                    <label className="text-[13px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Course Name</label>
-                    <input 
-                      type="text" 
-                      value={courseName}
-                      onChange={(e) => setCourseName(e.target.value)}
-                      placeholder="e.g. Advanced System Architecture"
-                      className="w-full px-6 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-300 font-black text-2xl text-slate-900 shadow-sm" 
-                    />
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-[13px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Brief Abstract</label>
-                    <textarea 
-                      rows={3}
-                      value={courseDesc}
-                      onChange={(e) => setCourseDesc(e.target.value)}
-                      placeholder="Specify high-level architectural objectives..."
-                      className="w-full px-6 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-300 font-bold text-lg text-slate-700 resize-none shadow-sm"
-                    ></textarea>
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div className="lg:col-span-8 space-y-6">
+                      <div className="space-y-3">
+                        <label className="text-[13px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Course Name</label>
+                        <input 
+                          type="text" 
+                          value={courseName}
+                          onChange={(e) => setCourseName(e.target.value)}
+                          placeholder="e.g. Advanced System Architecture"
+                          className="w-full px-6 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-300 font-black text-2xl text-slate-900 shadow-sm" 
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[13px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Brief Abstract</label>
+                        <textarea 
+                          rows={3}
+                          value={courseDesc}
+                          onChange={(e) => setCourseDesc(e.target.value)}
+                          placeholder="Specify high-level architectural objectives..."
+                          className="w-full px-6 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-300 font-bold text-lg text-slate-700 resize-none shadow-sm"
+                        ></textarea>
+                      </div>
+                    </div>
+
+                    {/* Thumbnail Selection */}
+                    <div className="lg:col-span-4 space-y-4">
+                      <label className="text-[13px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Course Cover</label>
+                      <div 
+                        className="group aspect-video rounded-3xl bg-white border-2 border-dashed border-slate-200 overflow-hidden relative flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 transition-all shadow-sm"
+                        onClick={() => setShowStockSelector(true)}
+                      >
+                        {thumbnailUrl ? (
+                          <img src={thumbnailUrl} alt="Thumbnail" className="w-full h-full object-cover" />
+                        ) : (
+                          <>
+                            <ImageIcon className="w-8 h-8 text-slate-300 group-hover:text-blue-500 transition-colors mb-2" />
+                            <span className="text-[10px] font-black uppercase text-slate-400 group-hover:text-blue-600 transition-colors">Select Visual</span>
+                          </>
+                        )}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="text-white text-[10px] font-black uppercase tracking-widest">Change Image</span>
+                        </div>
+                      </div>
+                      
+                      <div className="relative">
+                        <input type="file" id="custom-thumb" className="hidden" accept="image/*" onChange={handleCustomThumbnail} />
+                        <label htmlFor="custom-thumb" className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer transition-all">
+                          <FileUp className="w-3.5 h-3.5" /> Upload Custom
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 <div className="pt-4 flex justify-end">
                   <button 
-                    disabled={!courseName}
+                    disabled={!courseName || !thumbnailUrl}
                     onClick={handleNext}
                     className="px-12 py-4 bg-slate-900 text-white rounded-[24px] font-black text-sm uppercase tracking-widest hover:bg-blue-600 disabled:opacity-30 transition-all flex items-center gap-3 group shadow-xl"
                   >
@@ -321,7 +395,7 @@ export default function CreateCourse() {
                   <button 
                     onClick={addLesson}
                     disabled={!newLessonTitle || (newLessonType === 'text' ? !newLessonText : !selectedFile)}
-                    className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-blue-700 disabled:opacity-30 transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-600/20"
+                    className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-blue-700 disabled:opacity-30 transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-600/10"
                   >
                     <Plus className="w-5 h-5" /> Append to Course Node
                   </button>
@@ -475,6 +549,51 @@ export default function CreateCourse() {
           </div>
         </div>
       </div>
+
+      {/* Stock Thumbnail Selector Modal */}
+      {showStockSelector && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-[#000a12]/90 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-white rounded-[48px] w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl">
+            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className="space-y-1">
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight text-left">Visual Asset Catalog</h2>
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest text-left">Select a verified infrastructure visual</p>
+              </div>
+              <button onClick={() => setShowStockSelector(false)} className="p-3 hover:bg-white rounded-2xl text-slate-400 hover:text-slate-900 transition-all shadow-sm">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                {stockThumbnails.map((url, i) => (
+                  <div 
+                    key={i}
+                    className={`group relative aspect-video rounded-2xl overflow-hidden cursor-pointer border-4 transition-all ${
+                      thumbnailUrl === url ? 'border-blue-600 scale-[0.98]' : 'border-transparent hover:border-slate-200'
+                    }`}
+                    onClick={() => {
+                      setThumbnailUrl(url);
+                      setShowStockSelector(false);
+                    }}
+                  >
+                    <img src={url} alt={`Stock ${i}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-xl">
+                        <CheckCircle2 className="w-6 h-6" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="p-8 bg-slate-50 border-t border-slate-100 text-center">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300">Enterprise High-Resolution Catalog</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

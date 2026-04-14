@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from '@remix-run/react';
-import { Book, Clock, PlayCircle, Loader2 } from 'lucide-react';
+import { PlayCircle, Loader2, CheckCircle2 } from 'lucide-react';
 
 interface Course {
   id: string;
   title: string;
   description: string;
+  thumbnailUrl: string;
   instructorId: string;
   status: string;
   createdAt: string;
@@ -54,7 +55,7 @@ export default function Courses() {
             <p className="font-bold text-sm uppercase tracking-widest">Accessing Infrastructure...</p>
           </div>
         ) : error ? (
-          <div className="text-center py-20 bg-red-50 rounded-[40px] border border-red-100">
+          <div className="text-center py-20 bg-red-50 rounded-[40px] border border-red-100 mx-4">
             <p className="text-red-600 font-black uppercase tracking-widest text-sm">Deployment Sync Error</p>
             <p className="text-red-400 mt-2">{error}</p>
           </div>
@@ -67,28 +68,38 @@ export default function Courses() {
             ) : (
               courses.map((course) => (
                 <div key={course.id} className="col-lg-4 col-md-6 mb-30 flex">
-                  <div className="group bg-white rounded-[40px] overflow-hidden shadow-2xl shadow-slate-200/60 border border-slate-100 flex flex-col w-full transition-all duration-500 hover:-translate-y-2 hover:shadow-blue-600/10 isolate">
+                  <Link
+                    to={`/course/${course.id}`}
+                    className="group bg-white rounded-[40px] overflow-hidden shadow-2xl shadow-slate-200/60 border border-slate-100 flex flex-col w-full transition-all duration-500 hover:-translate-y-2 hover:shadow-blue-600/10 isolate no-underline"
+                  >
                     {/* Visual Header */}
                     <div className="h-48 bg-[#000a12] relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20" />
-                      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
+                      {course.thumbnailUrl ? (
+                        <img
+                          src={course.thumbnailUrl}
+                          alt={course.title}
+                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20" />
+                      )}
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500" />
                       <div className="absolute top-6 left-6 px-3 py-1 bg-blue-600 text-white text-[8px] font-black rounded-full uppercase tracking-widest shadow-lg">
                         {course.status}
                       </div>
-                      <div className="absolute bottom-6 right-6 text-white/20 group-hover:text-blue-400 transition-colors duration-500">
+                      <div className="absolute bottom-6 right-6 text-white/40 group-hover:text-white transition-colors duration-500">
                         <PlayCircle className="w-12 h-12" />
                       </div>
                     </div>
 
                     <div className="p-8 flex-1 flex flex-col justify-between">
                       <div className="space-y-4">
-                        <div className="flex items-center gap-4 text-slate-400 text-[10px] font-black uppercase tracking-widest">
-                          <span className="flex items-center gap-1.5"><Book className="w-3.5 h-3.5 text-blue-600" /> Track</span>
-                          <span className="w-1 h-1 rounded-full bg-slate-200" />
-                          <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-blue-600" /> Scalable</span>
+                        <div className="flex items-center gap-2 text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
+                          <span>Lumina Verified Track</span>
                         </div>
                         <h3 className="text-2xl font-black text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">
-                          <Link to={`/course/${course.id}`} className="no-underline">{course.title}</Link>
+                          {course.title}
                         </h3>
                         <p className="text-slate-500 text-xs font-medium leading-relaxed line-clamp-2">
                           {course.description || "Comprehensive enterprise course designed for high-concurrency systems and architectural scaling."}
@@ -97,18 +108,15 @@ export default function Courses() {
 
                       <div className="pt-8 mt-8 border-t border-slate-50 flex items-center justify-between">
                         <div className="flex flex-col">
-                          <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Verification</span>
-                          <span className="text-xs font-black text-blue-600 italic">Lumina Verified</span>
+                          <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Academic Status</span>
+                          <span className="text-xs font-black text-blue-600 italic">Available Now</span>
                         </div>
-                        <Link
-                          to={`/course/${course.id}`}
-                          className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all no-underline shadow-lg shadow-slate-900/10"
-                        >
-                          Access Node
-                        </Link>
+                        <div className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest group-hover:bg-blue-600 transition-all shadow-lg shadow-slate-900/10">
+                          Explore Course
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 </div>
               ))
             )}
