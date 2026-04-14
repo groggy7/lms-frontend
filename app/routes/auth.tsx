@@ -17,7 +17,7 @@ export default function Auth() {
     setIsLoading(true);
     setMessage(null);
 
-    const endpoint = isLogin ? 'http://localhost:8080/login' : 'http://localhost:8080/register';
+    const endpoint = isLogin ? `${getApiUrl()}/login` : `${getApiUrl()}/register`;
     const body = isLogin 
       ? { email, password } 
       : { email, password, fullName };
@@ -154,6 +154,12 @@ export default function Auth() {
               </button>
             </p>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+    </div>
         </div>
       </div>
     </div>

@@ -25,3 +25,5 @@ dist-ssr
 
 estudy/
 build/
+.env
+example-courses.md

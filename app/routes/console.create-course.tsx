@@ -135,7 +135,7 @@ export default function CreateCourse() {
     setIsUploading(true);
     
     try {
-      const courseRes = await fetch('http://localhost:8080/courses', {
+      const courseRes = await fetch(`${getApiUrl()}/courses`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -602,6 +602,12 @@ export default function CreateCourse() {
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300">Enterprise High-Resolution Catalog</p>
             </div>
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+ </div>
         </div>
       )}
     </div>

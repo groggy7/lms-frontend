@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from '@remix-run/react';
 import { PlayCircle, Loader2, CheckCircle2 } from 'lucide-react';
+import { getApiUrl } from '../lib/config';
 
 interface Course {
   id: string;
@@ -20,7 +21,7 @@ export default function Courses() {
   useEffect(() => {
     async function fetchCourses() {
       try {
-        const response = await fetch('http://localhost:8080/courses', {
+        const response = await fetch(`${getApiUrl()}/courses`, {
           credentials: 'include'
         });
         if (!response.ok) throw new Error('Failed to fetch courses');

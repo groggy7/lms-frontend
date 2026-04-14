@@ -47,7 +47,7 @@ export default function CourseDetails() {
   useEffect(() => {
     async function fetchCourseDetails() {
       try {
-        const response = await fetch(`http://localhost:8080/courses/${id}`, {
+        const response = await fetch(`${getApiUrl()}/courses/${id}`, {
           credentials: 'include'
         });
         if (!response.ok) throw new Error('Failed to access course node');
@@ -269,6 +269,12 @@ export default function CourseDetails() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+iv>
         </div>
       </div>
     </div>

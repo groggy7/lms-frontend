@@ -194,7 +194,7 @@ export default function EditCourse() {
 
   const fetchCourse = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/courses/${id}`, {
+      const response = await fetch(`${getApiUrl()}/courses/${id}`, {
         credentials: 'include'
       });
       if (!response.ok) throw new Error('Failed to fetch course');
@@ -211,7 +211,7 @@ export default function EditCourse() {
     if (!course) return;
     setIsProcessing(true);
     try {
-      const res = await fetch(`http://localhost:8080/courses/${id}`, {
+      const res = await fetch(`${getApiUrl()}/courses/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: course.title, description: course.description }),
@@ -241,7 +241,7 @@ export default function EditCourse() {
         formData.append('asset', selectedFile);
       }
 
-      const res = await fetch(`http://localhost:8080/courses/${id}/lessons`, {
+      const res = await fetch(`${getApiUrl()}/courses/${id}/lessons`, {
         method: 'POST',
         body: formData,
         credentials: 'include'
@@ -264,7 +264,7 @@ export default function EditCourse() {
     if (!confirm('Decommission this module?')) return;
     setIsProcessing(true);
     try {
-      await fetch(`http://localhost:8080/courses/${id}/lessons/${lessonId}`, {
+      await fetch(`${getApiUrl()}/courses/${id}/lessons/${lessonId}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -277,7 +277,7 @@ export default function EditCourse() {
   const saveTextLesson = async (lesson: Lesson) => {
     setIsProcessing(true);
     try {
-      await fetch(`http://localhost:8080/courses/${id}/lessons/${lesson.id}`, {
+      await fetch(`${getApiUrl()}/courses/${id}/lessons/${lesson.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...lesson, contentBody: editingText }),
@@ -303,7 +303,7 @@ export default function EditCourse() {
     // Sync new order to backend via BULK reorder
     setIsProcessing(true);
     try {
-      const res = await fetch(`http://localhost:8080/courses/${id}/lessons/reorder`, {
+      const res = await fetch(`${getApiUrl()}/courses/${id}/lessons/reorder`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lessonIds: newContents.map(l => l.id) }),
@@ -517,6 +517,15 @@ export default function EditCourse() {
                 <CheckCircle2 className="w-5 h-5" />
                 Save
               </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+>
             </div>
           </div>
 
