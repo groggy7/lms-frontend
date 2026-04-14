@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import 'react-quill/dist/quill.snow.css';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/atom-one-dark.css';
 
 interface RichTextEditorProps {
   value: string;
@@ -9,6 +11,7 @@ interface RichTextEditorProps {
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, placeholder }) => {
   const [isMounted, setIsMounted] = useState(false);
+  const quillRef = React.useRef<any>(null);
 
   // We use a separate state for the dynamically loaded component
   const [QuillComponent, setQuillComponent] = useState<any>(null);
@@ -22,6 +25,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, placeh
   }, []);
 
   const modules = useMemo(() => ({
+    syntax: {
+      highlight: (text: string) => hljs.highlightAuto(text).value,
+    },
     toolbar: [
       [{ 'header': [1, 2, 3, false] }],
       ['bold', 'italic', 'underline', 'strike'],
@@ -29,6 +35,22 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, placeh
       ['code-block', 'blockquote'],
       ['clean']
     ],
+    keyboard: {
+      bindings: {
+        'code-block-backspace': {
+          key: 'Backspace',
+          format: ['code-block'],
+          handler: function(range: any, context: any) {
+            if (context.offset === 0 && context.prefix === '') {
+              // @ts-ignore - this refers to the quill instance in handlers
+              this.quill.format('code-block', false);
+              return false;
+            }
+            return true;
+          }
+        }
+      }
+    }
   }), []);
 
   const formats = [
@@ -43,14 +65,16 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, placeh
   }
 
   return (
-    <div className="rich-text-editor-wrapper">
+    <div className="rich-text-editor-wrapper relative">
       <QuillComponent 
+        ref={quillRef}
         theme="snow"
         value={value}
         onChange={onChange}
         modules={modules}
         formats={formats}
         placeholder={placeholder}
+        scrollingContainer="html"
         className="bg-white rounded-2xl overflow-hidden border-slate-200"
       />
       <style dangerouslySetInnerHTML={{ __html: `
@@ -72,11 +96,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, placeh
           line-height: 1.6;
         }
         .rich-text-editor-wrapper .ql-editor pre.ql-syntax {
-          background-color: #0f172a;
-          color: #f8fafc;
-          border-radius: 8px;
-          padding: 1rem;
+          border-radius: 1.25rem;
+          padding: 1.5rem;
           font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+          font-size: 14px;
+          line-height: 1.7;
+          margin: 1.5rem 0;
         }
       `}} />
     </div>

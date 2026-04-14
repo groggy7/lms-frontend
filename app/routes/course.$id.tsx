@@ -5,6 +5,21 @@ import LessonList from '../components/LessonList'
 import { FileText, Download, Activity, CheckCircle2, ChevronLeft, Loader2 } from 'lucide-react'
 import { useMounted } from '../hooks/use-mounted'
 import { marked } from 'marked'
+import { markedHighlight } from "marked-highlight";
+import hljs from 'highlight.js'
+import 'highlight.js/styles/atom-one-dark.css'
+
+// Configure marked with highlight.js using marked-highlight
+marked.use(markedHighlight({
+  langPrefix: 'hljs language-',
+  highlight(code, lang) {
+    const language = hljs.getLanguage(lang) ? lang : null;
+    if (language) {
+      return hljs.highlight(code, { language: lang }).value;
+    }
+    return hljs.highlightAuto(code).value;
+  }
+}));
 
 interface CourseContent {
   id: string;
@@ -50,18 +65,7 @@ export default function CourseDetails() {
     fetchCourseDetails();
   }, [id]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[#001a33] flex flex-col items-center justify-center gap-4 text-blue-400">
-        <Loader2 className="w-12 h-12 animate-spin" />
-        <p className="font-black text-xs uppercase tracking-[0.3em]">Synchronizing Secure Stream...</p>
-      </div>
-    );
-  }
-
-  if (!course) return <div className="p-20 text-center font-black">Course Node Not Found</div>;
-
-  const lessons = (course.contents || []).map(c => ({
+  const lessons = (course?.contents || []).map(c => ({
     id: c.id,
     title: c.title,
     duration: c.type === 'video' ? 'Dynamic' : 'Doc',
@@ -74,6 +78,25 @@ export default function CourseDetails() {
   }));
 
   const activeLesson = lessons.find(l => l.id === currentLessonId) || lessons[0];
+
+  useEffect(() => {
+    if (isMounted && activeLesson?.type === 'text') {
+      document.querySelectorAll('pre.ql-syntax').forEach((block) => {
+        hljs.highlightElement(block as HTMLElement);
+      });
+    }
+  }, [activeLesson?.id, activeLesson?.body, isMounted]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#001a33] flex flex-col items-center justify-center gap-4 text-blue-400">
+        <Loader2 className="w-12 h-12 animate-spin" />
+        <p className="font-black text-xs uppercase tracking-[0.3em]">Synchronizing Secure Stream...</p>
+      </div>
+    );
+  }
+
+  if (!course) return <div className="p-20 text-center font-black">Course Node Not Found</div>;
 
   const getVideoType = (url: string) => {
     if (!url) return 'video/mp4';
@@ -100,6 +123,20 @@ export default function CourseDetails() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-20 text-slate-900">
       {/* Course Top Header */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .hljs, .ql-syntax {
+          padding: 1.5rem !important;
+          border-radius: 1.25rem !important;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+          font-size: 14px !important;
+          line-height: 1.7 !important;
+          margin: 1.5rem 0 !important;
+        }
+        img {
+          max-width: 100% !important;
+          height: auto !important;
+        }
+      `}} />
       <div className="bg-[#001a33] text-white pt-16 pb-16 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-blue-600/10 to-transparent pointer-events-none" />
 
@@ -137,7 +174,7 @@ export default function CourseDetails() {
       <div className="container mt-10">
         <div className="flex flex-col lg:flex-row gap-10">
           {/* Left Column: Video & Info */}
-          <div className="flex-1 space-y-10">
+          <div className="flex-1 min-w-0 space-y-10">
             <div className="bg-black rounded-[32px] overflow-hidden shadow-2xl ring-1 ring-slate-200 h-[500px] flex items-center justify-center relative">
               {activeLesson?.type === 'video' ? (
                 isMounted && activeLesson.video ? (
@@ -148,9 +185,9 @@ export default function CourseDetails() {
                   <div className="text-slate-500 italic text-sm">Initializing Stream...</div>
                 )
               ) : activeLesson?.type === 'text' ? (
-                <div className="w-full h-full bg-white p-12 overflow-y-auto prose max-w-none prose-slate prose-headings:font-black prose-headings:text-slate-900 prose-p:text-slate-700 prose-strong:text-slate-900 prose-hr:border-slate-100">
+                <div className="w-full h-full bg-white p-12 overflow-y-auto overflow-x-hidden prose max-w-none prose-slate prose-headings:font-black prose-headings:text-slate-900 prose-p:text-slate-700 prose-strong:text-slate-900 prose-hr:border-slate-100 prose-pre:bg-transparent prose-pre:p-0">
                   <h2 className="text-3xl font-black mb-6">{activeLesson.title}</h2>
-                  <div className="text-slate-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: marked.parse(activeLesson.body || '') }} />
+                  <div className="text-slate-700 leading-relaxed overflow-x-auto" dangerouslySetInnerHTML={{ __html: marked.parse(activeLesson.body || '') }} />
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-6 text-white p-20 text-center">
