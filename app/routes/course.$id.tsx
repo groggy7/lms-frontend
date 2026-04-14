@@ -4,6 +4,7 @@ import VideoPlayer from '../components/VideoPlayer'
 import LessonList from '../components/LessonList'
 import { FileText, Download, Activity, CheckCircle2, ChevronLeft, Loader2 } from 'lucide-react'
 import { useMounted } from '../hooks/use-mounted'
+import { marked } from 'marked'
 
 interface CourseContent {
   id: string;
@@ -147,9 +148,9 @@ export default function CourseDetails() {
                   <div className="text-slate-500 italic text-sm">Initializing Stream...</div>
                 )
               ) : activeLesson?.type === 'text' ? (
-                <div className="w-full h-full bg-white p-12 overflow-y-auto prose max-w-none">
+                <div className="w-full h-full bg-white p-12 overflow-y-auto prose max-w-none prose-slate prose-headings:font-black prose-headings:text-slate-900 prose-p:text-slate-700 prose-strong:text-slate-900 prose-hr:border-slate-100">
                   <h2 className="text-3xl font-black mb-6">{activeLesson.title}</h2>
-                  <div className="text-slate-700 leading-relaxed whitespace-pre-wrap">{activeLesson.body}</div>
+                  <div className="text-slate-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: marked.parse(activeLesson.body || '') }} />
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-6 text-white p-20 text-center">
