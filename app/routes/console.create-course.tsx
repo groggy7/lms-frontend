@@ -528,14 +528,14 @@ export default function CreateCourse() {
                     <div className="flex flex-col sm:flex-row gap-6 pt-6">
                       <button 
                         onClick={resetForm}
-                        className="px-12 py-5 bg-white border border-slate-200 text-slate-900 rounded-3xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-2 shadow-xl"
+                        className="px-10 py-3.5 bg-white border border-slate-200 text-slate-900 rounded-3xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-2 shadow-xl"
                       >
                         <Plus className="w-5 h-5" />
                         New Course
                       </button>
                       <Link 
                         to="/console"
-                        className="px-12 py-5 bg-blue-600 text-white rounded-3xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 no-underline"
+                        className="px-10 py-3.5 bg-blue-600 text-white rounded-3xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 no-underline"
                       >
                         Infrastructure Console
                         <ArrowRight className="w-5 h-5" />

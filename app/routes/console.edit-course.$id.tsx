@@ -462,13 +462,15 @@ export default function EditCourse() {
                 </div>
               )}
 
-              <button 
-                onClick={addLesson}
-                disabled={isProcessing || !newLessonTitle || (newLessonType === 'text' ? !newLessonText : !selectedFile)}
-                className="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-blue-700 disabled:opacity-30 transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-600/20"
-              >
-                <Plus className="w-5 h-5" /> Append to Course Node
-              </button>
+              <div className="flex justify-end">
+                <button 
+                  onClick={addLesson}
+                  disabled={isProcessing || !newLessonTitle || (newLessonType === 'text' ? !newLessonText : !selectedFile)}
+                  className="px-10 py-3.5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-blue-700 disabled:opacity-30 transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-600/20"
+                >
+                  <Plus className="w-5 h-5" /> Append to Course Node
+                </button>
+              </div>
             </div>
 
             {/* Sortable List */}
