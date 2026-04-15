@@ -47,7 +47,7 @@ export default function Auth() {
       localStorage.setItem('lumina_user', JSON.stringify(data.user));
 
       setTimeout(() => {
-        navigate('/course/go-concurrency');
+        navigate('/console');
       }, 1000);
     } catch (err: any) {
       setMessage({ 
