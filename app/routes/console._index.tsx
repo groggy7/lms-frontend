@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Plus, 
-  Search, 
-  MoreVertical, 
-  Video, 
-  FileText, 
-  AlignLeft, 
-  ArrowRight,
+import {
+  Plus,
+  Search,
+  Video,
   BarChart3,
   Users,
   Clock,
@@ -17,7 +13,7 @@ import {
   Globe,
   Archive
 } from 'lucide-react';
-import { Link } from '@remix-run/react';
+import { Link, useNavigate } from '@remix-run/react';
 import { getApiUrl } from '../lib/config';
 
 interface ManagedCourse {
@@ -32,10 +28,28 @@ export default function ConsoleIndex() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const userStr = localStorage.getItem('lumina_user');
+    if (!userStr) {
+      navigate('/auth');
+      return;
+    }
+
+    try {
+      const user = JSON.parse(userStr);
+      if (user.role !== 'instructor') {
+        navigate('/courses');
+        return;
+      }
+    } catch (e) {
+      navigate('/auth');
+      return;
+    }
+
     fetchManagedCourses();
-  }, []);
+  }, [navigate]);
 
   async function fetchManagedCourses() {
     try {
@@ -55,7 +69,7 @@ export default function ConsoleIndex() {
 
   const deleteCourse = async (id: string) => {
     if (!confirm('Are you sure you want to decommission this course node? This action is permanent.')) return;
-    
+
     setIsProcessing(id);
     try {
       const res = await fetch(`${getApiUrl()}/courses/${id}`, {
@@ -106,8 +120,8 @@ export default function ConsoleIndex() {
                   Instructor <span className="text-blue-500">Console.</span>
                 </h1>
               </div>
-              <Link 
-                to="/console/create-course" 
+              <Link
+                to="/console/create-course"
                 className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:bg-blue-700 hover:-translate-y-1 transition-all flex items-center gap-3 no-underline"
               >
                 <Plus className="w-4 h-4" />
@@ -142,14 +156,14 @@ export default function ConsoleIndex() {
       <div className="container mx-auto px-4 -mt-8 relative z-20">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-[48px] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
-            
+
             {/* Toolbar */}
             <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50/50">
               <h2 className="text-xl font-black text-slate-900 tracking-tight">Active Courses</h2>
               <div className="relative max-w-sm w-full">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   placeholder="Filter courses..."
                   className="w-full pl-12 pr-6 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm font-medium"
                 />
@@ -199,9 +213,8 @@ export default function ConsoleIndex() {
 
                       <div className="flex items-center gap-6">
                         <div className="text-right hidden md:block">
-                          <p className={`text-[9px] font-black uppercase tracking-[0.2em] mb-1 ${
-                            course.status === 'published' ? 'text-green-500' : 'text-orange-400'
-                          }`}>
+                          <p className={`text-[9px] font-black uppercase tracking-[0.2em] mb-1 ${course.status === 'published' ? 'text-green-500' : 'text-orange-400'
+                            }`}>
                             {course.status}
                           </p>
                           <div className="flex gap-1 justify-end">
@@ -210,9 +223,9 @@ export default function ConsoleIndex() {
                             ))}
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center gap-2">
-                          <button 
+                          <button
                             onClick={() => toggleStatus(course)}
                             title={course.status === 'published' ? 'Revert to Draft' : 'Publish Course'}
                             className="p-3 hover:bg-white hover:shadow-md rounded-xl text-slate-400 hover:text-blue-600 transition-all"
@@ -222,7 +235,7 @@ export default function ConsoleIndex() {
                           <Link to={`/console/edit-course/${course.id}`} className="p-3 hover:bg-white hover:shadow-md rounded-xl text-slate-400 hover:text-slate-900 transition-all">
                             <Settings size={18} />
                           </Link>
-                          <button 
+                          <button
                             onClick={() => deleteCourse(course.id)}
                             className="p-3 hover:bg-white hover:shadow-md rounded-xl text-slate-400 hover:text-red-600 transition-all"
                           >
@@ -238,7 +251,7 @@ export default function ConsoleIndex() {
 
             {/* Empty State / Footer with Save Action */}
             <div className="p-10 bg-slate-50/30 flex flex-col items-center gap-6 border-t border-slate-50">
-              <button 
+              <button
                 onClick={() => alert('Infrastructure state synchronized successfully.')}
                 className="px-10 py-3 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-blue-600 transition-all shadow-xl shadow-slate-900/10 flex items-center gap-2"
               >

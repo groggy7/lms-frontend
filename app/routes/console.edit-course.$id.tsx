@@ -186,6 +186,23 @@ export default function EditCourse() {
   );
 
   useEffect(() => {
+    const userStr = localStorage.getItem('lumina_user');
+    if (!userStr) {
+      navigate('/auth');
+      return;
+    }
+    
+    try {
+      const user = JSON.parse(userStr);
+      if (user.role !== 'instructor') {
+        navigate('/courses');
+      }
+    } catch (e) {
+      navigate('/auth');
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     fetchCourse();
   }, [id]);
 
