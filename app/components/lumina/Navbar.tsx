@@ -18,26 +18,6 @@ const Navbar: React.FC = () => {
     const storedUser = localStorage.getItem('lumina_user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
-      
-      // Verify session with backend
-      const verifySession = async () => {
-        try {
-          const { getApiUrl } = await import('../../lib/config');
-          const response = await fetch(`${getApiUrl()}/me`, {
-            credentials: 'include'
-          });
-          
-          if (!response.ok) {
-            // Cookie is likely gone or invalid
-            localStorage.removeItem('lumina_user');
-            setUser(null);
-          }
-        } catch (err) {
-          console.error('Session verification failed:', err);
-        }
-      };
-      
-      verifySession();
     }
     
     return () => window.removeEventListener('scroll', handleScroll);
