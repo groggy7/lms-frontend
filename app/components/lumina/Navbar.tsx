@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from '@remix-run/react';
 import Logo from '../Logo';
-import { Menu, X, LayoutDashboard, LogIn, ChevronDown } from 'lucide-react';
+import { Menu, X, LayoutDashboard, ChevronDown } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const [user, setUser] = useState<any>(null);
@@ -14,27 +14,31 @@ const Navbar: React.FC = () => {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
-    
-    const storedUser = localStorage.getItem('lumina_user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const storedUser = localStorage.getItem('lumina_user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    } else {
+      setUser(null);
+    }
+  }, [location.pathname]);
+
   const isHomePage = location.pathname === '/';
-  
+
   // Logic for navbar appearance
-  const navBgClass = isHomePage 
+  const navBgClass = isHomePage
     ? (isScrolled ? 'bg-white/80 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-4' : 'bg-transparent py-10')
     : 'bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-4'; // Always white on other pages
 
-  const textColorClass = isHomePage 
+  const textColorClass = isHomePage
     ? (isScrolled ? 'text-slate-600 hover:text-blue-600' : 'text-white hover:text-blue-400')
     : 'text-slate-600 hover:text-blue-600';
 
-  const logoColor = isHomePage 
+  const logoColor = isHomePage
     ? (isScrolled ? "text-slate-900" : "text-white")
     : "text-slate-900";
 
@@ -53,9 +57,9 @@ const Navbar: React.FC = () => {
             {/* Logo Group */}
             <div className="flex items-center gap-12">
               <Link to="/" className="flex items-center hover:opacity-80 transition-opacity no-underline border-none outline-none">
-                <Logo 
-                  size={38} 
-                  textColor={logoColor} 
+                <Logo
+                  size={38}
+                  textColor={logoColor}
                 />
               </Link>
 
@@ -63,7 +67,7 @@ const Navbar: React.FC = () => {
               <div className="hidden lg:flex items-center gap-10">
                 {navLinks.map((link) => (
                   <div key={link.name} className="group relative">
-                    <Link 
+                    <Link
                       to={link.path}
                       className={`text-[13px] font-black uppercase tracking-[0.15em] flex items-center gap-1.5 transition-colors no-underline ${textColorClass}`}
                     >
@@ -79,8 +83,8 @@ const Navbar: React.FC = () => {
             {/* Desktop Actions */}
             <div className="hidden lg:flex items-center gap-8">
               {user ? (
-                <Link 
-                  to="/console" 
+                <Link
+                  to="/console"
                   className="flex items-center gap-2.5 px-6 py-3 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:bg-blue-700 hover:-translate-y-0.5 transition-all no-underline"
                 >
                   <LayoutDashboard className="w-4 h-4" />
@@ -88,21 +92,19 @@ const Navbar: React.FC = () => {
                 </Link>
               ) : (
                 <div className="flex items-center gap-8">
-                  <Link 
-                    to="/auth" 
-                    className={`text-[13px] font-black uppercase tracking-[0.15em] transition-colors no-underline ${
-                      isHomePage && !isScrolled ? 'text-white hover:text-blue-400' : 'text-slate-900 hover:text-blue-600'
-                    }`}
+                  <Link
+                    to="/auth"
+                    className={`text-[13px] font-black uppercase tracking-[0.15em] transition-colors no-underline ${isHomePage && !isScrolled ? 'text-white hover:text-blue-400' : 'text-slate-900 hover:text-blue-600'
+                      }`}
                   >
                     Login
                   </Link>
-                  <Link 
-                    to="/auth" 
-                    className={`px-7 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all no-underline ${
-                      (isHomePage && !isScrolled)
+                  <Link
+                    to="/auth"
+                    className={`px-7 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all no-underline ${(isHomePage && !isScrolled)
                         ? 'bg-white text-slate-900 hover:bg-blue-50 shadow-xl'
                         : 'bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-900/10'
-                    }`}
+                      }`}
                   >
                     Join Lumina
                   </Link>
@@ -111,10 +113,9 @@ const Navbar: React.FC = () => {
             </div>
 
             {/* Mobile Menu Toggle */}
-            <button 
-              className={`lg:hidden p-2 transition-colors ${
-                (isHomePage && !isScrolled) ? 'text-white' : 'text-slate-900'
-              }`}
+            <button
+              className={`lg:hidden p-2 transition-colors ${(isHomePage && !isScrolled) ? 'text-white' : 'text-slate-900'
+                }`}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -123,13 +124,12 @@ const Navbar: React.FC = () => {
         </div>
 
         {/* Full-screen Mobile Overlay */}
-        <div className={`lg:hidden fixed inset-0 top-[72px] bg-white z-50 transition-all duration-500 ease-in-out ${
-          mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
-        }`}>
+        <div className={`lg:hidden fixed inset-0 top-[72px] bg-white z-50 transition-all duration-500 ease-in-out ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
+          }`}>
           <div className="p-8 flex flex-col h-full">
             <div className="space-y-8">
               {navLinks.map((link) => (
-                <Link 
+                <Link
                   key={link.name}
                   to={link.path}
                   className="block text-4xl font-black text-slate-900 tracking-tighter no-underline"
@@ -139,11 +139,11 @@ const Navbar: React.FC = () => {
                 </Link>
               ))}
             </div>
-            
+
             <div className="mt-auto space-y-4">
               {user ? (
-                <Link 
-                  to="/course/go-concurrency" 
+                <Link
+                  to="/course/go-concurrency"
                   className="flex items-center justify-center gap-3 py-5 bg-blue-600 text-white rounded-3xl font-black text-lg no-underline"
                   onClick={() => setMobileMenuOpen(false)}
                 >
@@ -152,15 +152,15 @@ const Navbar: React.FC = () => {
                 </Link>
               ) : (
                 <>
-                  <Link 
-                    to="/auth" 
+                  <Link
+                    to="/auth"
                     className="flex items-center justify-center py-5 bg-slate-100 text-slate-900 rounded-3xl font-black text-lg no-underline"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Sign In
                   </Link>
-                  <Link 
-                    to="/auth" 
+                  <Link
+                    to="/auth"
                     className="flex items-center justify-center py-5 bg-blue-600 text-white rounded-3xl font-black text-lg no-underline"
                     onClick={() => setMobileMenuOpen(false)}
                   >
