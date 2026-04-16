@@ -65,7 +65,7 @@ export default function Home() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8">
               <Link 
-                to="/auth" 
+                to="/register" 
                 className="w-full sm:w-auto px-12 py-4 bg-blue-600 text-white rounded-[32px] font-black text-xl hover:bg-blue-500 hover:text-white hover:-translate-y-1 transition-all shadow-[0_20px_50px_rgba(37,99,235,0.3)] flex items-center justify-center gap-3 group"
               >
                 Join Now
@@ -204,7 +204,7 @@ export default function Home() {
               </div>
 
               <div className="pt-6">
-                <Link to="/auth" className="px-10 py-3.5 bg-slate-900 text-white rounded-[24px] font-bold hover:bg-slate-800 transition-all shadow-2xl shadow-slate-900/10 inline-block">
+                <Link to="/register" className="px-10 py-3.5 bg-slate-900 text-white rounded-[24px] font-bold hover:bg-slate-800 transition-all shadow-2xl shadow-slate-900/10 inline-block no-underline">
                   Discover the Technology
                 </Link>
               </div>

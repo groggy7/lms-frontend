@@ -41,7 +41,7 @@ export default function CreateCourse() {
   useEffect(() => {
     const userStr = localStorage.getItem('lumina_user');
     if (!userStr) {
-      navigate('/auth');
+      navigate('/login');
       return;
     }
 
@@ -51,7 +51,7 @@ export default function CreateCourse() {
         navigate('/courses');
       }
     } catch (e) {
-      navigate('/auth');
+      navigate('/login');
     }
   }, [navigate]);
 

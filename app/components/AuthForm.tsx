@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from '@remix-run/react';
-import Logo from '../components/Logo';
+import Logo from './Logo';
 import { getApiUrl } from '../lib/config';
 
-export default function Auth() {
-  const [isLogin, setIsLogin] = useState(true);
+interface AuthFormProps {
+  isLogin: boolean;
+}
+
+export default function AuthForm({ isLogin }: AuthFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -47,7 +50,11 @@ export default function Auth() {
       localStorage.setItem('lumina_user', JSON.stringify(data.user));
 
       setTimeout(() => {
-        navigate('/console');
+        if (data.user.role === 'instructor') {
+          navigate('/console');
+        } else {
+          navigate('/courses');
+        }
       }, 1000);
     } catch (err: any) {
       setMessage({ 
@@ -144,15 +151,12 @@ export default function Auth() {
           <div className="mt-8 pt-8 border-t border-slate-100 text-center">
             <p className="text-slate-500 text-sm">
               {isLogin ? "Don't have an account?" : "Already have an account?"}
-              <button 
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setMessage(null);
-                }}
+              <Link 
+                to={isLogin ? '/register' : '/login'}
                 className="ml-1.5 font-bold text-blue-600 hover:text-blue-700 underline-offset-4 hover:underline"
               >
                 {isLogin ? 'Sign up for free' : 'Sign in here'}
-              </button>
+              </Link>
             </p>
           </div>
         </div>

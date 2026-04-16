@@ -33,7 +33,7 @@ export default function ConsoleIndex() {
   useEffect(() => {
     const userStr = localStorage.getItem('lumina_user');
     if (!userStr) {
-      navigate('/auth');
+      navigate('/login');
       return;
     }
 
@@ -44,7 +44,7 @@ export default function ConsoleIndex() {
         return;
       }
     } catch (e) {
-      navigate('/auth');
+      navigate('/login');
       return;
     }
 

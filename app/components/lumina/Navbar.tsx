@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from '@remix-run/react';
+import { Link, useLocation, useNavigate } from '@remix-run/react';
 import Logo from '../Logo';
-import { Menu, X, LayoutDashboard, ChevronDown } from 'lucide-react';
+import { Menu, X, LayoutDashboard, ChevronDown, LogOut } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,20 +28,51 @@ const Navbar: React.FC = () => {
     }
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch(`${getApiUrl()}/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch (err) {
+      console.error('Logout failed:', err);
+    } finally {
+      localStorage.removeItem('lumina_user');
+      setUser(null);
+      setMobileMenuOpen(false);
+      navigate('/');
+    }
+  };
+
   const isHomePage = location.pathname === '/';
 
   // Logic for navbar appearance
-  const navBgClass = isHomePage
-    ? (isScrolled ? 'bg-white/80 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-4' : 'bg-transparent py-10')
-    : 'bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-4'; // Always white on other pages
+  const navBgClass = mobileMenuOpen
+    ? 'bg-transparent py-4'
+    : (isHomePage
+        ? (isScrolled ? 'bg-white/95 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-4' : 'bg-transparent py-6')
+        : 'bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-4');
 
   const textColorClass = isHomePage
     ? (isScrolled ? 'text-slate-600 hover:text-blue-600' : 'text-white hover:text-blue-400')
     : 'text-slate-600 hover:text-blue-600';
 
-  const logoColor = isHomePage
-    ? (isScrolled ? "text-slate-900" : "text-white")
-    : "text-slate-900";
+  const logoColor = mobileMenuOpen
+    ? "text-white"
+    : (isHomePage
+        ? (isScrolled ? "text-slate-900" : "text-white")
+        : "text-slate-900");
 
   const navLinks = [
     { name: 'Solutions', path: '/', dropdown: ['Enterprise', 'Scale', 'Security'] },
@@ -51,7 +83,7 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${navBgClass}`}>
+      <nav className={`fixed top-0 left-0 right-0 z-[1100] transition-all duration-300 ${navBgClass}`}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             {/* Logo Group */}
@@ -81,26 +113,38 @@ const Navbar: React.FC = () => {
             </div>
 
             {/* Desktop Actions */}
-            <div className="hidden lg:flex items-center gap-8">
+            <div className="hidden lg:flex items-center gap-6">
               {user ? (
-                <Link
-                  to="/console"
-                  className="flex items-center gap-2.5 px-6 py-3 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:bg-blue-700 hover:-translate-y-0.5 transition-all no-underline"
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                  Console
-                </Link>
+                <>
+                  {user.role === 'instructor' && (
+                    <Link
+                      to="/console"
+                      className="flex items-center gap-2.5 px-6 py-3 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:bg-blue-700 hover:-translate-y-0.5 transition-all no-underline"
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                      Console
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${isHomePage && !isScrolled ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'
+                      }`}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                </>
               ) : (
                 <div className="flex items-center gap-8">
                   <Link
-                    to="/auth"
+                    to="/login"
                     className={`text-[13px] font-black uppercase tracking-[0.15em] transition-colors no-underline ${isHomePage && !isScrolled ? 'text-white hover:text-blue-400' : 'text-slate-900 hover:text-blue-600'
                       }`}
                   >
                     Login
                   </Link>
                   <Link
-                    to="/auth"
+                    to="/register"
                     className={`px-7 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all no-underline ${(isHomePage && !isScrolled)
                         ? 'bg-white text-slate-900 hover:bg-blue-50 shadow-xl'
                         : 'bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-900/10'
@@ -114,54 +158,71 @@ const Navbar: React.FC = () => {
 
             {/* Mobile Menu Toggle */}
             <button
-              className={`lg:hidden p-2 transition-colors ${(isHomePage && !isScrolled) ? 'text-white' : 'text-slate-900'
-                }`}
+              className={`lg:hidden p-2 transition-colors relative z-[1200] ${
+                mobileMenuOpen 
+                  ? 'text-white' 
+                  : (isHomePage 
+                      ? (isScrolled ? 'text-slate-900' : 'text-white') 
+                      : 'text-slate-900')
+              }`}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
         </div>
+      </nav>
 
-        {/* Full-screen Mobile Overlay */}
-        <div className={`lg:hidden fixed inset-0 top-[72px] bg-white z-50 transition-all duration-500 ease-in-out ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
-          }`}>
-          <div className="p-8 flex flex-col h-full">
-            <div className="space-y-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  className="block text-4xl font-black text-slate-900 tracking-tighter no-underline"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {link.name}
-                </Link>
-              ))}
-            </div>
+      {/* Full-screen Mobile Overlay - MOVED OUTSIDE NAV FOR STACKING CONTEXT PURPOSES */}
+      <div className={`lg:hidden fixed inset-0 bg-slate-900 z-[1000] transition-all duration-500 ease-in-out ${mobileMenuOpen ? 'opacity-100 translate-y-0 visible' : 'opacity-0 translate-y-full invisible pointer-events-none'
+        }`}>
+        <div className="p-8 pt-28 flex flex-col h-full overflow-y-auto">
+          <div className="space-y-6 mb-12">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.path}
+                className="block text-3xl font-black text-white tracking-tighter no-underline hover:text-blue-500 transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
 
-            <div className="mt-auto space-y-4">
+            <div className="mt-auto space-y-3 pb-12">
               {user ? (
-                <Link
-                  to="/course/go-concurrency"
-                  className="flex items-center justify-center gap-3 py-5 bg-blue-600 text-white rounded-3xl font-black text-lg no-underline"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <LayoutDashboard />
-                  Dashboard
-                </Link>
+                <>
+                  {user.role === 'instructor' && (
+                    <Link
+                      to="/console"
+                      className="flex items-center justify-center gap-2 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm no-underline"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <LayoutDashboard size={18} />
+                      Console
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-center gap-2 py-4 bg-white/10 text-white rounded-2xl font-black text-sm"
+                  >
+                    <LogOut size={18} />
+                    Sign Out
+                  </button>
+                </>
               ) : (
                 <>
                   <Link
-                    to="/auth"
-                    className="flex items-center justify-center py-5 bg-slate-100 text-slate-900 rounded-3xl font-black text-lg no-underline"
+                    to="/login"
+                    className="flex items-center justify-center py-4 bg-white/10 text-white rounded-2xl font-black text-sm no-underline"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Sign In
                   </Link>
                   <Link
-                    to="/auth"
-                    className="flex items-center justify-center py-5 bg-blue-600 text-white rounded-3xl font-black text-lg no-underline"
+                    to="/register"
+                    className="flex items-center justify-center py-4 bg-blue-600 text-white rounded-2xl font-black text-sm no-underline"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Get Started
@@ -169,9 +230,8 @@ const Navbar: React.FC = () => {
                 </>
               )}
             </div>
-          </div>
         </div>
-      </nav>
+      </div>
       {/* Background spacer for fixed nav if needed on other pages */}
       <div className={isHomePage ? '' : 'h-[80px]'} />
     </>

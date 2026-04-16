@@ -98,17 +98,20 @@ const Footer: React.FC = () => {
           <div className="col-lg-3 col-md-6">
             <div className="footer-wiget">
               <div className="footer-wiget-title">
-                <h4>Our Projects</h4>
+                <h4>Stay Updated</h4>
               </div>
-              <div className="footer-widget-photo">
-                <ul>
-                  <li><img src="/lumina-assets/images/footer/footer1.png" alt="" /></li>
-                  <li><img src="/lumina-assets/images/footer/footer2.png" alt="" /></li>
-                  <li><img src="/lumina-assets/images/footer/footer3.png" alt="" /></li>
-                  <li><img src="/lumina-assets/images/footer/footer4.png" alt="" /></li>
-                  <li><img src="/lumina-assets/images/footer/footer5.png" alt="" /></li>
-                  <li><img src="/lumina-assets/images/footer/footer6.png" alt="" /></li>
-                </ul>
+              <div className="footer-newsletter-text mb-4">
+                <p className="text-white/60 text-sm">Subscribe to receive technical bulletins and new course alerts.</p>
+              </div>
+              <div className="footer-newsletter-form relative">
+                <input 
+                  type="email" 
+                  placeholder="Email Address" 
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-blue-500 transition-colors"
+                />
+                <button className="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-[10px] uppercase tracking-widest py-3 rounded-xl transition-all shadow-lg shadow-blue-600/20">
+                  Subscribe Now
+                </button>
               </div>
             </div>
           </div>
