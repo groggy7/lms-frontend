@@ -15,6 +15,21 @@ import Logo from "./components/Logo";
 import ScrollToTop from "./components/ScrollToTop";
 import { useMounted } from "./hooks/use-mounted";
 
+if (typeof window !== "undefined") {
+  const originalFetch = window.fetch;
+  window.fetch = async (...args) => {
+    const response = await originalFetch(...args);
+    if (response.status === 401) {
+      const storedUser = localStorage.getItem('lumina_user');
+      if (storedUser) {
+        localStorage.removeItem('lumina_user');
+        window.location.href = '/login';
+      }
+    }
+    return response;
+  };
+}
+
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {

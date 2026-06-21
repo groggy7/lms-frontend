@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from '@remix-run/react';
 import Logo from '../Logo';
 import { Menu, X, LayoutDashboard, ChevronDown, LogOut } from 'lucide-react';
+import { getApiUrl } from '../../lib/config';
 
 const Navbar: React.FC = () => {
   const [user, setUser] = useState<any>(null);
@@ -23,10 +24,21 @@ const Navbar: React.FC = () => {
     const storedUser = localStorage.getItem('lumina_user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
+      
+      // Verify session on page load
+      fetch(`${getApiUrl()}/me`, { credentials: 'include' })
+        .then(res => {
+          if (res.status === 401) {
+            localStorage.removeItem('lumina_user');
+            setUser(null);
+            navigate('/login');
+          }
+        })
+        .catch(err => console.error('Failed to verify session:', err));
     } else {
       setUser(null);
     }
-  }, [location.pathname]);
+  }, [location.pathname, navigate]);
 
   useEffect(() => {
     if (mobileMenuOpen) {
