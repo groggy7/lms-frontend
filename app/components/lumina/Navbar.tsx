@@ -56,6 +56,7 @@ const Navbar: React.FC = () => {
   };
 
   const isHomePage = location.pathname === '/';
+  const isCourseDetailPage = location.pathname.startsWith('/course/');
 
   // Logic for navbar appearance
   const navBgClass = mobileMenuOpen
@@ -83,7 +84,7 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 right-0 z-[1100] transition-all duration-300 ${navBgClass}`}>
+      <nav className={`${isCourseDetailPage ? 'relative' : 'fixed top-0 left-0 right-0'} z-[1100] transition-all duration-300 ${navBgClass}`}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             {/* Logo Group */}
@@ -233,7 +234,7 @@ const Navbar: React.FC = () => {
         </div>
       </div>
       {/* Background spacer for fixed nav if needed on other pages */}
-      <div className={isHomePage ? '' : 'h-[80px]'} />
+      {!(isHomePage || isCourseDetailPage) && <div className="h-[80px]" />}
     </>
   );
 };
